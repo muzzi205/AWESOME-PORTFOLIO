@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>COMMENTS</title>
+  <link rel="icon" href="./IMAGES/favicon.png" type="image/x-icon" />
+<style>
+  .neon-button {
+    display: inline-block;
+    padding: 10px 30px;
+    border-radius: 40px;
+    border: 2px solid #f9004d;
+    background-color: #f9004d;
+    color: #1f242d;
+    font-weight: 600px;
+    font-size: 16px;
+    box-shadow: 0 0 10px #f9004d;
+    transition: 2s;
+}
+</style>
+</head>
+<body>
+ 
+  <section id="comments" style="padding: 4rem 2rem; text-align: center; background-color: #0f001a; color: white;">
+    <h2 class="section-heading text-glow-pink">Post a Comment</h2>
+    <div class="comment-container" style="
+      max-width: 700px;
+      margin: auto;
+      padding: 30px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 30px #00ffd544, 0 0 10px #f9004d33;
+      color: white;
+    ">
+      <p style="color: #aaa; font-size: 16px;">We are happy to hear from you</p>
+      <div class="head" style="margin: 10px 0; color: #aaa;">
+        <span id="comment-count">0</span> Comments
+      </div>
+  
+      <div class="comments" style="margin-top: 20px; text-align: left; line-height: 21.7px;"></div>
+  
+      <div class="commentbox" style="display: flex; gap: 10px; margin-top: 30px;">
+        <img class="selected-avatar-preview" src="./img1/user.png" alt="user" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #f9004d;">
+        <div class="contents" style="width: 100%;">
+          <h2 style="font-size: 17px;">Choose Avatar:</h2>
+          <div class="avatar-select" style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <img src="ava1.png" class="avatar-option" data-avatar="ava1.png" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;">
+            <img src="ava2.png" class="avatar-option" data-avatar="ava2.png" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;">
+            <img src="ava3.png" class="avatar-option" data-avatar="ava3.png" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;">
+            <img src="ava4.png" class="avatar-option" data-avatar="ava4.png" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;">
+            <img src="ava5.png" class="avatar-option" data-avatar="ava5.png" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;">
+            <img src="ava6.png" class="avatar-option" data-avatar="ava6.png" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;">
+
+          </div>
+          <input type="text" value="Anonymous" class="anonymous-input" style="width: 100%; margin-bottom: 10px; height: 30px;">
+          <input type="text" placeholder="Enter your comment" class="usercomment" style="width: 100%; margin-bottom: 20px; height: 30px;">
+          <button type="submit" disabled id="publish" class="neon-button">Publish</button>
+        </div>
+      </div>
+      
+    </div>
+  </section>
+  <script>
+    let selectedAvatar = "./img1/user.png";
+  
+    // Avatar selection logic
+    document.querySelectorAll(".avatar-option").forEach((img) => {
+      img.addEventListener("click", () => {
+        selectedAvatar = img.dataset.avatar;
+        document.querySelector(".selected-avatar-preview").src = selectedAvatar;
+  
+        // Highlight selected avatar
+        document.querySelectorAll(".avatar-option").forEach(i => i.style.border = "none");
+        img.style.border = "2px solid #00ffae";
+      });
+    });
+  
+    const anonymousInput = document.querySelector(".anonymous-input");
+    const userComment = document.querySelector(".usercomment");
+    const publishBtn = document.querySelector("#publish");
+    const comments = document.querySelector(".comments");
+  
+    userComment.addEventListener("input", (e) => {
+      publishBtn.disabled = e.currentTarget.value === "";
+    });
+  
+    function addComment() {
+      const name = anonymousInput.value;
+      const message = userComment.value;
+      const date = new Date().toLocaleString();
+  
+      const publishedComment = `
+        <div class="parent" style="display: flex; gap: 10px; margin: 20px 0;">
+          <img src="${selectedAvatar}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
+          <div>
+            <h1 style="font-size: 14px;">${name}</h1>
+            <p style="font-size: 14px;">${message}</p>
+            <span style="font-size: 12px; color: gray;">${date}</span>
+          </div>
+        </div>
+      `;
+  
+      comments.innerHTML += publishedComment;
+      localStorage.setItem("comments", comments.innerHTML);
+      userComment.value = "";
+      anonymousInput.value = "Anonymous";
+      document.getElementById("comment-count").textContent = document.querySelectorAll(".parent").length;
+      publishBtn.disabled = true;
+    }
+  
+    publishBtn.addEventListener("click", addComment);
+  
+    window.addEventListener("DOMContentLoaded", () => {
+      comments.innerHTML = localStorage.getItem("comments") || "";
+      document.getElementById("comment-count").textContent = document.querySelectorAll(".parent").length;
+    });
+  </script>
+</body>
+</html>
+
+
+
+

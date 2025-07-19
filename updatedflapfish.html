@@ -1,0 +1,497 @@
+<link rel="icon" href="./IMAGES/favicon.png" type="image/x-icon" />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Fish</title>
+    <link rel="stylesheet" href="styl.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
+</head>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Bungee', sans-serif;
+}
+#canvas1 { 
+    position: absolute;
+    top: 0;
+    left: 0;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.assets{
+    display: none;
+}
+button:hover {
+    background-color: azure;
+}
+</style>
+<body>
+    <canvas id="canvas1">
+    </canvas>
+<body>
+    <button onclick="reload()" style="position: fixed;margin-top:600px; margin-left: 1050px; background-color: transparent; padding-top:20px;
+    padding-bottom:20px; padding-left:20px;
+    padding-right:20px;
+    border-color: white; 
+    border-radius: 2px;font-size: 20px; color: white; border: solid;">R</button>
+    
+    <div class="assets">
+ <img id="background" src="./assetsup/images/background_single.png" alt="">
+ <img id="background2" src="./assetsup/images/background_single2.png" alt="">
+ <img id="player_fish" src="./assetsup/images/player_fish.png" alt="">
+ <img id="smallGears" src="./assetsup/images/smallGears.png" alt="">
+ <audio id="charge" src="./assetsup/images/charge.mp3"></audio>
+ <audio id="flap1" src="./assetsup/images/flap1.mp3"></audio>
+ <audio id="flap2" src="./assetsup/images/flap2.mp3"></audio>
+  <audio id="flap3" src="./assetsup/images/flap3.mp3"></audio>
+   <audio id="flap4" src="./assetsup/images/flap4.mp3"></audio>
+    <audio id="flap5" src="./assetsup/images/flap5.mp3"></audio>
+    <audio id="win" src="./assetsup/images/win.mp3"></audio>
+    <audio id="lose" src="./assetsup/images/lose.mp3"></audio>
+    </div>
+</body>
+
+    <script>
+        class AudioControl{
+            constructor(){
+            this.charge = document.getElementById('charge');
+            this.flap1 = document.getElementById('flap1');
+            this.flap2= document.getElementById('flap2');
+            this.flap3 = document.getElementById('flap3');
+            this.flap4 = document.getElementById('flap4');
+            this.flap5 = document.getElementById('flap5');
+            this.flapSounds = [this.flap1,this.flap2,this.flap3,this.flap4,this.flap5];
+         
+            this.win = document.getElementById('win');
+            this.lose = document.getElementById('lose');
+            }
+            play(sound){
+             sound.currentTime = 0;
+             sound.play();
+            }
+         }
+    </script>
+    <script>
+        class Background {
+            constructor(game){
+              this.game = game;
+              this.image = document.getElementById('background');
+              this.image2 = document.getElementById('background2');
+              this.width = 2400;
+              this.height = this.game.baseHeight;
+              this.x;
+              this.scaledWidth; 
+              this.scaledHeight;
+          
+            }
+          update(){
+            this.x -= this.game.speed;
+             if (this.x <= - this.scaledWidth) this.x = 0;
+          }
+          draw(){
+             this.game.ctx.drawImage(this.image, this.x, 0, this.scaledWidth, this.scaledHeight);
+          
+             this.game.ctx.drawImage(this.image, this.x + this.scaledWidth - 2, 0, this.scaledWidth, this.scaledHeight);
+          
+             if(this.game.canvas.width >= this.scaledWidth) {
+              this.game.ctx.drawImage(this.image, this.x + this.scaledWidth * 2 - 2, 0, this.scaledWidth, this.scaledHeight);
+             }
+          }
+          resize(){
+            this.scaledWidth = this.width * this.game.ratio;
+            this.scaledHeight = this.height * this.game.ratio;
+          
+            this.x = 0; 
+          }
+          }
+    </script>
+    <script>
+        class Player {
+            constructor(game){
+                this.game = game;
+                this.x = 20;
+                this.y;
+                this.spriteWidth = 200;
+                this.spriteHeight = 200;
+                this.width;
+                this.height;
+                this.speedY = -5;
+                this.flapSpeed;
+                this.collisionX;
+                this.collisionY;
+                this.collisionRadius;
+                this.collided;
+                this.energy = 30;
+                this.maxEnergy = this.energy * 2;
+               this.minEnergy = 15;
+               this.barSize;
+               this.charging;
+               this.image = document.getElementById('player_fish');
+               this.frameY;
+            }
+            draw(){
+                this.game.ctx.drawImage(this.image, 0, this.frameY * this.spriteHeight, this.spriteWidth, this.spriteHeight, this.x, this.y, this.width, this.height);
+                this.game.ctx.beginPath();
+          this.game.ctx.arc(this.collisionX + this.collisionRadius * 0.9, this.collisionY, this.collisionRadius, 0, Math.PI * 2);
+          this.game.ctx.stroke();
+            }
+            update(){
+                this.handleEnergy();
+                if(this.speedY >= 0) this.wingsUp()
+                this.y += this.speedY;
+                this.collisionY = this.y + this.height * 0.5;
+                if (!this.isTouchingBottom() && !this.charging){
+                    this.speedY += this.game.gravity;
+                } else {
+                    this.speedY = 0;
+                }
+                // bottom boundary
+                if (this.isTouchingBottom()){
+                    this.y = this.game.height - this.height - this.game.bottomMargin;
+                    this.wingsIdle();
+                } 
+            }
+            resize(){
+                this.width = this.spriteWidth * this.game.ratio;
+                this.height = this.spriteHeight * this.game.ratio;
+                this.y = this.game.height * 0.5 - this.height * 0.5;
+                this.speedY = -8 * this.game.ratio;
+                this.flapSpeed = 10 * this.game.ratio;
+                this.collisionRadius = 40 * this.game.ratio;
+                this.collisionX = this.x + this.width * 0.6;
+                this.collided = false;
+                this.barSize = Math.floor(5 * this.game.ratio);
+                this.energy = 30;
+                this.frameY = 0;
+                this.charging = false
+            }
+            startCharge(){
+                if (this.energy >= this.minEnergy && !this.charging){     
+                    this.charging = true;
+                    this.game.speed  = this.game.maxSpeed;
+                    this.wingsCharge();
+                    this.game.sound.play(this.game.sound.charge);
+                } else{
+                    this.stopCharge();
+                }
+            }
+            stopCharge(){
+                this.charging = false;
+                this.game.speed  = this.game.minSpeed;
+        
+            }
+            wingsIdle(){
+                if(!this.charging) this.frameY = 0;
+            }
+            wingsDown(){
+              if(!this.charging) this.frameY = 1;
+            }
+            wingsUp(){
+                if(!this.charging) this.frameY = 2;
+            }
+            wingsCharge(){
+                this.frameY = 3;
+            }
+            isTouchingTop(){
+                return this.y <= 0;
+            }
+            isTouchingBottom(){
+                return this.y >= this.game.height - this.height - this.game.bottomMargin;
+            }
+            handleEnergy(){
+                if (this.game.eventUpdate){
+                    if (this.energy < this.maxEnergy){
+                        this.energy += 2;
+                    }
+                    if(this.charging){
+                        this.energy -= 5;
+                        if(this.energy <= 0){
+                            this.energy = 0;
+                            this.stopCharge();
+                        }
+                    }
+                }
+            }
+            flap(){
+                this.stopCharge();
+                if(!this.isTouchingTop()){
+                this.speedY = -this.flapSpeed;
+                this.game.sound.play(this.game.sound.flapSounds[Math.floor(Math.random()*5) ])
+                this.wingsDown();
+                }
+            }
+        }
+    </script>
+    <script>
+        class Obstacle {
+            constructor(game, x){
+              this.game = game;
+              this.SpriteWidth = 120;
+              this.SpriteHeight = 120;
+              this.scaledWidth = this.SpriteWidth * this.game.ratio;
+              this.scaledHeight = this.SpriteHeight * this.game.ratio;
+              this.height;
+              this.x = x;
+              this.y = Math.random() * (this.game.height - this.scaledHeight);
+              this.collisionX;
+              this.collisionY;
+              this.collisionRadius;
+              this.speedY = Math.random() < 0.5 ? -1 * this.game.ratio: 1 *  this.game.ratio; 
+              this.markedForDeletion = false;
+              this.image = document.getElementById('smallGears');
+              this.frameX = Math.floor(Math.random() * 4);
+            }
+          update(){
+            this.x -= this.game.speed;
+            this.y += this.speedY;
+            this.collisionX = this.x + this.scaledWidth * 0.5;
+            this.collisionY = this.y + this.scaledHeight * 0.5;
+            if (!this.game.gameOver) {
+              if(this.y <= 0 || this.y >= this.game.height - this.scaledHeight){
+                this.speedY *= -3;
+              }
+            } else{
+              this.speedY += 0.1;
+            }
+            if(this.isOffScreen()){
+              this.markedForDeletion = true;
+              this.game.obstacles = this.game.obstacles.filter(obstacle => !obstacle.markedForDeletion);
+              this.game.score++; 
+              if(this.game.obstacles.length <= 0) {
+              this.game.triggerGameOver();
+          
+              }
+            }
+            if (this.game.checkCollision(this, this.game.player)){
+              this.game.player.collided = true;
+              this.game.player.stopCharge();
+              this.game.triggerGameOver();
+            }
+            }
+          draw(){
+            this.game.ctx.drawImage(this.image, this.frameX * this.SpriteWidth, 0, this.SpriteWidth,this.SpriteHeight, this.x, this.y, this.scaledWidth, this.scaledHeight);
+            this.game.ctx.beginPath();
+            this.game.ctx.arc(this.collisionX, this.collisionY, this.collisionRadius, 0, Math.PI * 2);
+            this.game.ctx.stroke();
+          }
+          resize(){
+            this.scaledWidth = this.SpriteWidth * this.game.ratio;
+            this.scaledHeight = this.SpriteHeight * this.game.ratio;
+            this.collisionRadius = this.scaledWidth * 0.4
+          }
+          isOffScreen(){
+            return this.x < - this.scaledWidth || this.y > this.game.height;
+          }
+          }
+    </script>
+    <script>
+        class Game {
+            constructor(canvas, context){
+                this.canvas = canvas;
+                this.ctx = context;
+                this.width = this.canvas.width;
+                this.height = this.canvas.height;
+                this.baseHeight = 720;
+                this.ratio = this.height / this.baseHeight;
+                this.background = new Background(this); 
+                this.player = new Player(this);
+                this.sound = new AudioControl();
+                this.obstacles = [];
+                this.numberOfObstacles = 20;
+                this.gravity;
+                this.speed;
+                this.minSpeed;
+                this.maxSpeed;
+                this.score;
+                this.gameOver;
+                this.bottomMargin;
+                this.timer;
+                this.message1;
+                this.message2;
+                this.smallFont;
+                this.largeFont;
+                this.eventTimer = 0;
+                this.eventInterval = 150; 
+                this.eventUpdate = false;
+                this.touchStartX;
+                this.swipeDistance = 50;
+        
+                this.resize(window.innerWidth, window.innerHeight);
+        
+                window .addEventListener('resize', e => {
+                       this.resize(e.currentTarget.innerWidth, e.currentTarget.innerHeight);
+                });
+                //mouse controls
+                this.canvas.addEventListener('mousedown',  e => {
+                    this.player.flap();
+        
+                });
+                this.canvas.addEventListener('mouseup',  e => {
+                    this.player.wingsUp(); 
+                });
+                // keyboard controls
+                window.addEventListener('keydown', e => {
+                console.log(e.key);
+                if(e.key === ' ' || e.key === 'Enter')  this.player.flap();
+                if(e.key === 'Shift' || e.key.toLowerCase() === 'c')  this.player.startCharge();
+             });
+        
+             window.addEventListener('keyup',  e => {
+                this.player.wingsUp(); 
+            });
+             // touch controls
+             this.canvas.addEventListener('touchstart',  e => {
+                this.player.flap();
+                this.touchStartX = e.changedTouches[0].pageX;
+            });
+            this.canvas.addEventListener('touchmove',  e => {
+              if (e.changedTouches[0].pageX - this.touchStartX > this.swipeDistance) {
+                this.player.startCharge();
+              }
+            })
+            }
+            resize(width, height){
+                this.canvas.width = width;
+                this.canvas.height = height; 
+                this.ctx.fillStyle = 'blue';
+                this.ctx.textAlign = 'right';
+                this.ctx.lineWidth = 1;
+                this.ctx.strokeStyle = 'transparent';
+                this.width = this.canvas.width
+                this.height = this.canvas.height
+                this.ratio = this.height / this.baseHeight;
+           
+                this.bottomMargin = Math.floor(50 * this.ratio);
+                this.smallFont = Math.ceil(20 * this.ratio);
+                this.largeFont = Math.ceil(45 * this.ratio);
+                this.ctx.font =  this.smallFont+'px Bungee'; 
+                this.gravity = 0.30 * this.ratio;
+                this.speed = 8 * this.ratio;
+                this.minSpeed =  this.speed;
+                this.maxSpeed = this.speed * 7;
+                this.background.resize();
+                this.player.resize();
+                this.createObstacles();
+                this.obstacles.forEach(obstacle => {
+                obstacle.resize();
+                });
+                this.score = 0;
+                this.gameOver = false
+                this.timer = 0;
+        
+            }
+            render(deltaTime){ 
+                if(!this.gameOver) this.timer += deltaTime;
+                this.handlePeriodicEvents(deltaTime)
+                this.background.update();
+                this.background.draw();
+                this.drawStatusText();
+                this.player.update();
+                this.player.draw();
+                        this.obstacles.forEach(obstacle => {
+                obstacle.update();
+                obstacle.draw();
+        
+                });
+            }
+            createObstacles(){
+                this.obstacles = [];
+                const firstX = this.baseHeight * this.ratio; 
+                const ObstacleSpacing = 600 * this.ratio;
+                for(let i = 0; i < this.numberOfObstacles; i++){
+                    this.obstacles.push(new Obstacle (this, firstX + i * ObstacleSpacing));
+                }
+            }      
+            checkCollision(a, b){
+                const dx = a.collisionX - b.collisionX;
+                const dy = a.collisionY - b.collisionY;
+                const distance = Math.hypot(dx, dy);
+                const sumOfRadii = a.collisionRadius + b.collisionRadius;
+                return distance <= sumOfRadii
+            }
+              formatTimer(){
+                return (this.timer * 0.001).toFixed(1);
+            }
+            handlePeriodicEvents(deltaTime){
+                if(this.eventTimer < this.eventInterval){
+                    this.eventTimer += deltaTime;
+                    this.eventUpdate = false;
+                } else {
+                    this.eventTimer = this.eventTimer % this.eventInterval;
+                    this.eventUpdate = true;
+                }
+            }
+            triggerGameOver(){
+                if(!this.gameOver){
+                    this.gameOver = true;
+                    if(this.obstacles.length <= 0){
+                        this.sound.play(this.sound.win);
+                        this.message1 = "Nailed it!";
+                        this.message2 =" Can you do it faster than " + this.formatTimer() + ' seconds!';
+                    } else {
+                        this.sound.play(this.sound.lose);
+                        this.message1 = "Getting rusty?";
+                        this.message2 = "Collision Time " + this.formatTimer() + ' seconds!';
+                    }
+                }
+            }
+            drawStatusText(){
+                this.ctx.save();
+                this.ctx.fillText('Score: ' +this.score, this.width - this.smallFont, this.largeFont)
+                this.ctx.textAlign = 'left';
+                this.ctx.fillText('Timer: ' +this.formatTimer(), this.smallFont, this.largeFont)
+                if(this.gameOver){
+                this.ctx.textAlign = 'center'; 
+                this.ctx.font = this.largeFont + 'px Bungee'
+                    this.ctx.fillText(this.message1, this.width * 0.5, this.height * 0.5 - this.largeFont, this.width);
+                    this.ctx.font = this.smallFont+'px Bungee'
+                    this.ctx.fillText(this.message2, this.width * 0.5, this.height * 0.5 - this.smallFont, this.width);
+                    this.ctx.fillText("Press the 'R' button, command 'R' or control 'R' to try again! " , this.width * 0.5, this.height * 0.5,  this.width);
+                }
+                if(this.player.energy <= this.player.minEnergy)this.ctx.fillStyle = 'red';
+                else if (this.player.energy >= this.player.maxEnergy)this.ctx.fillStyle = 'lawngreen';
+                for (let i = 0; i < this.player.energy; i++){
+                    this.ctx.fillRect(10 + i * 6, 50, 5, 15);
+                }
+                this.ctx.restore();
+        
+            }
+        }
+        
+        window.addEventListener('load', function(){
+            const canvas = document.getElementById('canvas1');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 720;
+            canvas.height = 720;
+        
+            const game = new Game(canvas, ctx);
+        
+            let lastTime = 0;
+            function animate(timeStamp){
+                const deltaTime = timeStamp - lastTime;
+                lastTime = timeStamp;
+               // ctx.clearRect(0, 0, canvas.width, canvas.height);
+                game.render(deltaTime);
+        requestAnimationFrame(animate);
+            }
+            requestAnimationFrame(animate);
+        
+        });
+    </script>
+    <script>
+        function reload(){
+            const button = document.querySelector("button");
+            button.addEventListener("click", () => {
+                window.location.reload();
+            })
+        }
+        </script>
+</body>
+</html>

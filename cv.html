@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Muzzammil Oloyede - CV</title>
+  <link rel="icon" href="./IMAGES/favicon.png" type="image/x-icon" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: #fff;
+      overflow-x: hidden;
+      background: #0f0c29;
+      position: relative;
+      min-height: 100vh;
+    }
+
+    .bg-animated {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, #1a1a40 0%, #0f0c29 100%);
+      z-index: -2;
+      overflow: hidden;
+    }
+
+    .particles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image: radial-gradient(#00ffe0 1px, transparent 1px);
+      background-size: 20px 20px;
+      animation: move 60s linear infinite;
+      opacity: 0.1;
+    }
+
+    @keyframes move {
+      0% {
+        transform: translate(0, 0);
+      }
+      100% {
+        transform: translate(-1000px, -1000px);
+      }
+    }
+
+    .cv-container {
+      max-width: 900px;
+      margin: 80px auto;
+      background: rgba(0, 0, 0, 0.75);
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+      backdrop-filter: blur(15px);
+    }
+
+    h1 {
+      font-size: 38px;
+      color: #00ffe0;
+      text-align: center;
+      margin-bottom: 8px;
+      text-shadow: 0 0 10px #00ffe0;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 18px;
+      margin-bottom: 30px;
+      color: #ccc;
+    }
+
+    h2 {
+      font-size: 24px;
+      color: #00ffb3;
+      margin-top: 30px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #00ffc8;
+      padding-bottom: 5px;
+    }
+
+    .info {
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    strong {
+      color: #00ffc8;
+    }
+
+    a {
+      color: #77faff;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+/* Typing Effect */
+.typewriter {
+  overflow: hidden;
+  border-right: 2px solid #00ffe0;
+  white-space: nowrap;
+  width: 0;
+  margin: auto;
+  animation: typing 4s steps(30, end) forwards, blink 0.75s step-end infinite;
+}
+
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes blink {
+  50% { border-color: transparent; }
+}
+
+/* Fade In */
+.fade-in {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeUp 1s ease forwards;
+}
+
+.fade-in:nth-of-type(1) { animation-delay: 0.2s; }
+.fade-in:nth-of-type(2) { animation-delay: 0.4s; }
+.fade-in:nth-of-type(3) { animation-delay: 0.6s; }
+.fade-in:nth-of-type(4) { animation-delay: 0.8s; }
+.fade-in:nth-of-type(5) { animation-delay: 1.0s; }
+
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+    @media (max-width: 600px) {
+      .cv-container {
+        padding: 20px;
+        margin: 40px 15px;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-animated">
+    <div class="particles"></div>
+  </div>
+
+  <div class="cv-container">
+    <h1 class="typewriter">Muzzammil Oloyede</h1>
+    <div class="subtitle fade-in">Web & Game Developer</div>
+
+    <div class="info fade-in"><strong>Email:</strong> muzzamiloloyede@gmail.com</div>
+    <div class="info fade-in"><strong>Location:</strong> Ilorin, Nigeria</div>
+    <div class="info fade-in"><strong>School:</strong> Flora College (JSS3)</div>
+
+    <h2 class="fade-in">About Me</h2>
+    <p class="fade-in">
+      A passionate developer who started coding at 8. I specialize in web and game development, and I love turning bold ideas into fun digital experiences.
+    </p>
+
+    <h2 class="fade-in">Skills</h2>
+    <ul class="fade-in">
+      <li>HTML, CSS, JavaScript</li>
+      <li>Game Development (Canvas, Phaser.js)</li>
+      <li>Git & GitHub</li>
+      <li>Responsive Web Design</li>
+    </ul>
+
+    <h2 class="fade-in">Education</h2>
+    <p class="fade-in">Flora College – JSS3</p>
+
+    <h2 class="fade-in">Projects</h2>
+    <ul class="fade-in">
+      <a href="samurai.html" target="_blank"><li><strong>Samurai Warriors:</strong></a> A 2D browser fighting game built with HTML5 and JavaScript.</li>
+      <li><strong>My Portfolio Website:</strong> A modern showcase of my learning journey and projects.</li>
+    </ul>
+
+    <h2 class="fade-in">Certifications</h2>
+    <ul class="fade-in">
+      <li>Responsive Web Design – freeCodeCamp</li>
+    </ul>
+
+    <h2 class="fade-in">Languages</h2>
+    <ul class="fade-in">
+      <li>English (Fluent)</li>
+      <li>Hausa (Native)</li>
+    </ul>
+
+    <h2 class="fade-in">References</h2>
+    <p class="fade-in">Available on request.</p>
+  </div>
+
+</body>
+
+</html>

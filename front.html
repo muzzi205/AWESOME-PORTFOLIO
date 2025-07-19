@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frontend Mentor</title>
+  <link rel="icon" href="./IMAGES/favicon.png" type="image/x-icon" />
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+</head>
+<style>
+  .hero {
+    height: 100vh;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+  }
+  
+  body {
+    font-family: sans-serif;
+    background: whitesmoke;
+  }
+  
+  
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 35px;
+    /* padding-left: 8%; */
+    /* padding-right: 8%; */
+    background-color: whitesmoke;
+    height: 30px;
+    border-radius: 3px;
+    width: 100%;
+  }
+  
+  .logo {
+    color: black;
+    font-size: 35px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    margin-left: 50px;
+  }
+  
+  nav ul li {
+    list-style-type: none;
+    display: inline-block;
+  }
+  
+  nav ul li a {
+    color: black;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 15px;
+    text-transform: capitalize;
+    margin-right: 20px;
+  }
+  
+  
+  .btn {
+    background-color: black;
+    color: white;
+    text-decoration: none;
+    border: 2px solid transparent;
+    font-weight: bold;
+    padding: 10px 25px;
+    border-radius: 30px;
+    margin-right: 50px;
+  }
+  
+  .loi {
+    margin-left: 150px;
+  }
+  
+  section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-left: 15px;
+  }
+  
+  .herosection .mine {
+    font-size: 60px;
+    font-family: Barlow, sans-serif;
+  }
+  
+  .code img {
+    height: 528px;
+    width: 690px;
+  }
+  
+  .par {
+    font-size: 20px;
+    line-height: 30px;
+  }
+  
+  button {
+    background-color: #f9004d;
+    outline: none;
+    border-radius: 30px;
+    border: none;
+    padding-left: 40px;
+    padding-right: 40px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    font-size: 15px;
+    color: white;
+  }
+  
+  .crowd {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    background: white;
+    border-radius: 10px;
+  }
+  
+  .crowd-assets img {
+    width: 165px;
+    height: 63px;
+  }
+  
+  .pic img {
+    height: 73px;
+    width: 73px;
+    border-radius: 100px;
+    margin-left: 200px;
+  }
+  
+  .kica {
+  
+    margin-top: 170px;
+    background-color: white;
+    width: 450px;
+    height: 450px;
+    padding-top: 160px;
+    padding-left: 20px;
+    padding-right: 20px;
+    border-radius: 10px;
+  }
+  
+  .ic img {
+    height: 73px;
+    width: 73px;
+    border-radius: 100px;
+    margin-left: 200px;
+  }
+  
+  .kima {
+  
+    margin-top: 170px;
+    background-color: white;
+    width: 450px;
+    height: 450px;
+    padding-top: 160px;
+    padding-left: 20px;
+    padding-right: 20px;
+    border-radius: 10px;
+  }
+  
+  .mo {
+    display: flex;
+    justify-content: space-around;
+  }
+  
+  .ba {
+    display: flex;
+    justify-content: space-around;
+  }
+  
+  .new {
+    margin-top: 150px;
+  }
+  
+  .c {
+    border-color: 2px solid greenyellow;
+  }
+  
+  .ck {
+    display: flex;
+  }
+  
+  .ma {
+    margin-top: 150px;
+    margin-left: 150px;
+  }
+  
+  
+  .hw{
+    font-size: 36.96px;
+    font-family: Barlow, sans-serif;
+  }
+  
+  .slug{
+    color: rgb(115, 115, 115)
+  }
+  
+  .moon{
+   margin-left: 100px;
+   margin-top: 150px;
+  }
+  .zamil{
+    font-size: 36.96px;
+    font-family: Barlow, sans-serif;
+  }
+  .ter{
+    color: rgb(115, 115, 115)
+  
+  }
+  
+  .on{
+    display: flex;
+  }
+  .moon img{
+  background-color: whitesmoke;
+  }
+  .muzzamiloloyedeand{
+    margin-left: 100px;
+  }
+  .dad{
+    color: rgb(99, 59, 59);
+  }
+  .dad:hover{
+    background-color: rgb(49, 218, 27);
+    transition: 0.9s;
+  }
+</style>
+<body>
+  <div class="ever">
+    <div class="hero">
+      <nav>
+        <a href="" class="muzzamiloloyedeand">
+          <img src="ASSETS/BattleBreakersLogo.png" alt="" width="120" height="80">
+        </a>
+        
+        <div class="loi">
+          
+          <ul>
+            <li><a href="#">challenges</a></li>
+            <li><a href="#about">solution</a></li>
+            <li><a href="#service">articles</a></li>
+            <li><a href="#contact">resources</a></li>
+            <li><a href="#contact">Unlock pro</a></li>
+          </ul>
+        </div>
+        
+        <a href="#" class="btn">Login with github</a>
+      
+      </nav>
+      <section>
+        <div class="herosection">
+          <p class="mine" style="color: rgb(62, 84, 163);">Improve your coding <br> skills by building <br>
+            realistic projects</p>
+          <p class="par" style="color: rgb(115, 115, 115);">Our proffesonally designed challenges help you gain
+            hands-on experience writing HTML, CSS and JavaScript. We create the designs so you can focus on the
+            code and see your skills skyrocket.</p>
+          <button class="dad">Login with github</button>
+          <div data-aos="flip-left" data-aos-easing="ease-out-cubic" data-aos-duration="2000" class="crowd">
+            <div class="crowd-asset">
+              <img src="./ASSETS/home-community-avatars.webp" alt="">
+            </div>
+            <p class="crowd-text">Join 732,918 developer building projects,
+              reviewing code, and helping each other improve.
+            </p>
+          </div>
+        </div>
+        <div class="code">
+          <img src="./ASSETS/home-hero.webp" alt="">
+        </div>
+      </section>
+
+      <div class="mo">
+        <div data-aos="flip-left" class="kica">
+          <div class="colin">
+            <p
+              style="font-size: 1.2rem; text-align: center; font-weight: 400; line-height: 1.5; font-family: Heebo, sans-serif;">
+              I highly recommend Frontend Mentor. Skip the search for project ideas and dive into ready-made challenges
+              that help you level up as a developer.</p>
+          </div>
+          <div class="pic">
+            <img src="./ASSETS/my dad.jpeg" alt="">
+            <p style="margin-left: 150px; color: rgb(62, 84, 163); font-size: 20px;">Dr Abdulkareem Oloyede</p>
+            <p>(Associate Professor) , Dept of Telecom. Sci. and Ag. Director Center for Research Development and
+              In-House
+              Training (CREDIT) Unilorin, Head, Radio & TV Unit KWASU and UofA and Post Doc Researcher Uni of York</p>
+
+          </div>
+        </div>
+
+        <div data-aos="flip-left" class="kima">
+          <div class="olin">
+            <p
+              style="font-size: 1.2rem; text-align: center; font-weight: 400; line-height: 1.5; font-family: Heebo, sans-serif;">
+              I highly recommend Frontend Mentor. Skip the search for project ideas and dive into ready-made challenges
+              that help you level up as a developer.</p>
+          </div>
+          <div class="ic">
+            <img src="./ASSETS/grandpa.jpeg" alt="">
+            <p style="margin-left: 150px; color: rgb(62, 82, 156); font-size: 20px;"> professor Ishaq Oloyede</p>
+            <p class="robin" style="margin-left: 70px;">CEO of Joint Admissions and Matriculation Board(JAMB)</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="oly">
+        <div class="co">
+          <h3 style="text-align: center;">As Featured on...</h3>
+          <div class="ba">
+            <div data-aos="fade-up-right" class="c">
+              <img src="./ASSETS/logo-css-tricks.svg" alt="">
+            </div>
+
+            <div data-aos="fade-up-right" class="ss">
+              <img src="./ASSETS/logo-stack-overflow.svg" alt="">
+            </div>
+
+            <div data-aos="fade-up-right" class="la">
+              <img src="./ASSETS/logo-product-hunt.svg" alt="">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ck">
+        <div class="new" data-aos="zoom-in-up">.
+<img src="./ASSETS/home-benefit-1.webp" alt="" width="600" height="464">
+        </div>
+        <div class="ma">
+          <div class="pa">
+            <p class="hw">Escape tutorial hell</p>
+            <p class="slug">Add projects to your learning journey and put your knowledge to the test. The real learning happens when you start solving real-world problems yourself.</p>
+          </div>
+        </div>
+
+      </div>
+      <div class="on">
+      <div class="moon">
+
+      
+        <p class="zamil">
+          Build portfolio-worthy<br> projects
+        </p>
+        <p class="ter">Design is hard. We take care of the project ideas and design <br>so you can focus on the coding. You'll end up with an <br>incredible portfolio of stunning projects!</p>
+      </div>
+        <div data-aos="fade-up" class="html">
+          <img src="./ASSETS/home brew .webp" alt="" width="596" height="620">
+        </div>
+      
+    </div>
+  </div>
+  </div>
+
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init();
+  </script>
+</body>
+
+</html>
+
+  

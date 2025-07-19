@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Web Development</title>
+  <link rel="icon" href="./IMAGES/favicon.png" type="image/x-icon" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Merriweather&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --accent: #00ffd5;
+      --glass: rgba(255, 255, 255, 0.04);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    
+    body {
+      font-family: 'Rubik', sans-serif;
+      background: linear-gradient(-45deg, #0d0d0d, #1b1b2f, #000000, #121212);
+      background-size: 400% 400%;
+      animation: gradient 12s ease infinite;
+      color: #ffffff;
+      min-height: 100vh;
+      padding: 60px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    @keyframes gradient {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .card {
+      background: var(--glass);
+      backdrop-filter: blur(14px);
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 900px;
+      width: 100%;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+      animation: fadeIn 1.2s ease forwards;
+    }
+
+    h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 40px;
+      color: var(--accent);
+      margin-bottom: 20px;
+      text-align: center;
+      text-shadow: 0 0 20px var(--accent);
+    }
+
+    p {
+      font-size: 18px;
+      line-height: 1.8;
+      margin-bottom: 16px;
+    }
+
+    .highlight {
+      color: #00f7ff;
+      font-weight: bold;
+      text-shadow: 0 0 5px #00f7ff;
+    }
+
+    a {
+      color: #9df7ff;
+      font-weight: bold;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+
+    a:hover {
+      color: #00ffd5;
+      text-shadow: 0 0 10px #00ffd5;
+    }
+
+    .cta {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .cta button {
+      padding: 12px 30px;
+      background: var(--accent);
+      border: none;
+      border-radius: 40px;
+      color: #1a1a1a;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      box-shadow: 0 0 15px var(--accent);
+    }
+
+    .cta button:hover {
+      background: #00e6c0;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+      margin: 40px 0;
+      text-align: center;
+    }
+
+    .stat {
+      background: rgba(255, 255, 255, 0.07);
+      border-radius: 15px;
+      padding: 20px;
+      transition: transform 0.3s ease;
+    }
+
+    .stat:hover {
+      transform: scale(1.05);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .stat h2 {
+      font-size: 36px;
+      color: #ffe66d;
+    }
+
+    .stat p {
+      font-size: 16px;
+      margin-top: 8px;
+      color: #ddd;
+    }
+
+    footer {
+      margin-top: 50px;
+      text-align: center;
+      font-size: 14px;
+      color: #888;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 30px; }
+      .card { padding: 25px; }
+      .stat h2 { font-size: 28px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>💻 My Web Dev Journey</h1>
+    <p>
+      When I started web development, I hit a lot of walls. But I didn’t stop. I built, broke, rebuilt. I kept learning. And that’s how I became better — <span class="highlight">one bug at a time.</span>
+    </p>
+    <p>
+      I've also made a clone of 
+      <a href="front.html">Frontend Mentor</a>, which challenged my layout and CSS skills without using JavaScript.
+    </p>
+    <p>
+      I believe websites should be fast, beautiful, and friendly — and I’m always improving.
+    </p>
+
+    <div class="cta">
+      <button onclick="window.location.href='front.html'">View Early Project 🚀</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <h2>70%</h2>
+        <p>of my bugs were solved by just rereading the code</p>
+      </div>
+      <div class="stat">
+        <h2>90%</h2>
+        <p>of my UI ideas came from sites like Dribbble and Codepen</p>
+      </div>
+      <div class="stat">
+        <h2>3AM</h2>
+        <p>is when most of my creative breakthroughs happen 🌙</p>
+      </div>
+      <div class="stat">
+        <h2>100%</h2>
+        <p>dedicated to getting better with each project</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 Muzzamil Oloyede — Powered by 💡 ideas and pure <code>&lt;code&gt;</code>
+  </footer>
+
+</body>
+</html>

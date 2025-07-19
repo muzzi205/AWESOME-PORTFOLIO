@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio</title>
+  <link rel="icon" href="./IMAGES/favicon.png" type="image/x-icon" />
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: sans-serif;
+      background: linear-gradient(145deg, #0f001a, #000);
+      color: white;
+      overflow-x: hidden;
+    }
+.container{
+  background-color: black;
+  color: white;
+}
+.commentbox input{
+  border-radius: 10px;
+}
+    .hero-modern {
+      height: 100vh;
+      background-image: url(./IMAGES/ChatGPT\ Image\ Jun\ 25\,\ 2025\,\ 10_42_10\ PM.png);
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding-left: 50px;
+      position: relative;
+    }
+
+    .nav-glass {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 50px;
+      background: rgba(0, 0, 50, 0.6);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+    }
+
+    .logo {
+      font-size: 30px;
+      color: white;
+    }
+
+    .highlight-pink {
+      color: #f9004d;
+    }
+
+
+    /* Testimonial icons glowing */
+#testimonials .glass-card i {
+  color: #f9004d;
+  text-shadow: 0 0 10px #f9004d, 0 0 20px #f9004d;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Testimonial card hover effect */
+#testimonials .glass-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 25px #00ffd5aa, 0 0 35px #f9004daa;
+}
+
+
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 70px;
+      font-size: 20px;
+      margin-right: 150px;
+    }
+
+    .nav-links li a {
+      text-decoration: none;
+      color: white;
+      font-weight: bold;
+      transition: color 0.3s;
+    }
+
+    .nav-links li a:hover {
+      color: #00ffd5;
+    }
+    .hero-content{
+      margin-left: 280px;
+    }
+    .hero-title {
+      font-size: 70px;
+      display: flex;
+      align-items: baseline; /* Align everything to the text baseline */
+      gap: 10px;
+      flex-wrap: wrap;
+      line-height: 1.2;
+    }
+
+    .animated-wrapper {
+      position: relative;
+      display: inline-block;
+      height: 1em; /* Restrict height to one line */
+      vertical-align: baseline;
+    }
+    
+    .animated-role {
+      position: absolute;
+color: transparent;
+-webkit-text-stroke: .7px #f8014f;
+
+      left: 0;
+      top: 0;
+      opacity: 0;
+      animation: roleFade 9s infinite;
+      white-space: nowrap;
+    }
+    
+    .animated-role:nth-child(1) { animation-delay: 0s; }
+    .animated-role:nth-child(2) { animation-delay: 3s; }
+    .animated-role:nth-child(3) { animation-delay: 6s; }
+    
+    @keyframes roleFade {
+      0%   { opacity: 0; }
+      5%   { opacity: 1; }
+      30%  { opacity: 1; }
+      35%  { opacity: 0; }
+      100% { opacity: 0; }
+    }
+    .about-modern, .service-modern {
+      padding: 100px 30px;
+      
+      
+    }
+     
+    .section-heading {
+      font-size: 50px;
+      margin-bottom: 50px;
+      text-align: center;
+    }
+
+    .text-glow-green {
+      color: #00ff87;
+      text-shadow: 0 0 15px #00ff87;
+    }
+/* Glowing Loading Screen */
+#loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #0f001a;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loader-text {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 28px;
+  color: #00ffae;
+  text-shadow:
+    0 0 5px #00ffae,
+    0 0 10px #00ffae,
+    0 0 20px #f9004d,
+    0 0 30px #f9004d;
+  animation: pulse-glow 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    text-shadow:
+      0 0 5px #00ffae,
+      0 0 10px #00ffae,
+      0 0 20px #f9004d,
+      0 0 30px #f9004d;
+  }
+  50% {
+    text-shadow:
+      0 0 20px #00ffae,
+      0 0 30px #00ffae,
+      0 0 40px #f9004d,
+      0 0 50px #f9004d;
+  }
+}
+
+    .text-glow-pink {
+      color: #f9004d;
+      text-shadow: 0 0 15px #f9004d;
+    }
+
+    .about-container, .card-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 40px;
+    }
+
+    .image-card img {
+      width: 300px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    .about-text {
+      max-width: 500px;
+    }
+
+    .about-text h2 {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+
+    .about-text .subtitle {
+      font-size: 24px;
+      color: #f9004d;
+      margin-bottom: 20px;
+    }
+
+    .about-text p {
+      font-size: 16px;
+      color: #ccc;
+      margin-bottom: 20px;
+    }
+
+    /* Glass Card Base Style */
+
+
+/* 🔥 Hover Scale-Up Effect */
+.image-card:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 30px #00ffaecc, 0 0 40px #ff4ec4aa;
+  z-index: 2;
+  border-radius: 20px;
+}
+
+/* Optional: Add a bit of icon animation too */
+
+.image-card i {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: #00ffae;
+  transition: transform 0.3s ease;
+}
+
+.image-card:hover i {
+  transform: scale(1.2) rotate(5deg);
+}
+
+    .explore-btn, .card-btn {
+      padding: 10px 20px;
+      border-radius: 30px;
+      background-color: #00ffd5;
+      color: black;
+      text-decoration: none;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .explore-btn:hover, .card-btn:hover {
+      background-color: #f9004d;
+      color: white;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(14px);
+      padding: 30px;
+      width: 300px;
+      border-radius: 20px;
+      text-align: center;
+    }
+
+
+
+    .glass-card i {
+      font-size: 40px;
+      color: #00ffd5;
+      margin-bottom: 15px;
+    }
+
+    .glass-card h3 {
+      font-size: 22px;
+      color: white;
+      margin-bottom: 10px;
+    }
+
+    .glass-card p {
+      font-size: 14px;
+      color: #ccc;
+      margin-bottom: 20px;
+    }
+
+    /* Glass Card Base Style */
+.glass-card {
+  cursor: pointer;
+  position: relative;
+  border-radius: 1.5rem;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 15px rgba(0, 255, 174, 0.1);
+  color: white;
+  text-align: center;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  transform-origin: center;
+}
+
+.skill-card {
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, rgba(0, 255, 174, 0.05), rgba(249, 0, 77, 0.05));
+  box-shadow: 0 0 10px rgba(0, 255, 174, 0.1);
+}
+
+.skill-card:hover {
+  transform: scale(1.05) rotate(-1deg);
+  box-shadow: 0 0 25px #00ffd5aa, 0 0 40px #f9004daa;
+}
+
+.skill-card i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 5px #00ffd5;
+}
+
+.skill-card h3 {
+  font-size: 20px;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 0 10px #f9004d99;
+}
+
+.skill-card p {
+  font-size: 14px;
+  line-height: 1.4;
+  color: #ddd;
+}
+
+
+/* 🔥 Hover Scale-Up Effect */
+.glass-card:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 30px #00ffaecc, 0 0 40px #ff4ec4aa;
+  z-index: 2;
+}
+
+
+.glass-card i {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: #00ffae;
+  transition: transform 0.3s ease;
+}
+
+.glass-card:hover i {
+  transform: scale(1.2) rotate(5deg);
+}
+
+
+    @media (max-width: 768px) {
+      .hero-content h1 {
+        font-size: 50px;
+      }
+
+      .hero-content h2 {
+        font-size: 20px;
+      }
+
+      .section-heading {
+        font-size: 36px;
+      }
+    }
+/* Main Section Glow Background */
+.epic-about-section {
+  background-color: rgb(12, 12, 26);
+  padding: 6rem 2rem;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+/* Glitch Heading */
+.glitch-heading {
+  position: relative;
+  font-size: 3rem;
+  color: white;
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.glitch-heading::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: #f8014f;
+  z-index: -1;
+  animation: glitch 1s infinite linear alternate-reverse;
+  opacity: 0.7;
+}
+
+@keyframes glitch {
+  0% { transform: translate(1px, -1px); }
+  20% { transform: translate(-1px, 2px); }
+  40% { transform: translate(-2px, 1px); }
+  60% { transform: translate(2px, 1px); }
+  80% { transform: translate(1px, -2px); }
+  100% { transform: translate(0px, 0px); }
+}
+
+/* Image Cards with Glow */
+
+/* About Text Styling */
+.about-text {
+  max-width: 500px;
+  padding: 2rem;
+  color: #f0f0f0;
+  backdrop-filter: blur(8px);
+  border-left: 2px solid #00ffae;
+  border-radius: 20px;
+  margin-top: 2rem;
+}
+
+/* Text Animations */
+.animated-intro {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.neon-flicker {
+  color: #00ffae;
+  text-shadow: 0 0 10px #00ffae, 0 0 20px #00ffae;
+  animation: flicker 2s infinite;
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  45% { opacity: 0.6; }
+  60% { opacity: 0.8; }
+  75% { opacity: 0.4; }
+}
+
+/* Subtitle Rocket Animation */
+.rocket {
+  animation: bounceRocket 1.5s infinite;
+  display: inline-block;
+}
+
+@keyframes bounceRocket {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* Explore Button with Glow */
+.neon-button {
+  display: inline-block;
+  padding: 10px 30px;
+  border-radius: 40px;
+  border: 2px solid #f9004d;
+  background-color: #f9004d;
+  color: #1f242d;
+  font-weight: 600px;
+font-size: 16px;
+box-shadow: 0 0 10px #f9004d;
+transition: 2s;
+}
+
+.neon-button:hover {
+  background: transparent;
+  color: #f9004d;
+  box-shadow: none;
+}
+
+/* Responsive Layout */
+.about-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  align-items: center;
+}
+
+/* Footer */
+footer {
+  background-color: black;
+  color: white;
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.95rem;
+  margin-top: 2rem;
+  box-shadow: #0ddb7b;
+}
+
+footer a {
+  color: #a5d6a7;
+  font-weight: 500;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+    
+    /* Contact Section Styles */
+   
+  </style>
+</head>
+
+<body>
+  <div id="loader">
+    <div class="loader-text">Muzzamil's Portfolio</div>
+  </div>
+  <!-- HERO SECTION -->
+  <div class="hero-modern">
+    <nav class="nav-glass">
+      <h2 class="logo">Portfo<span class="highlight-pink">lio</span></h2>
+      <ul class="nav-links">
+        <li><a href="#">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#service">Learning</a></li>
+        <li><a href="#testimonials">Testimonials</a></li>
+        <li><a href="#comments">Comments</a></li>
+
+      </ul>
+    </nav>
+
+    <div class="hero-content" data-aos="fade-up">
+      <h4 style="font-size: 60px; color: rgb(241, 172, 183);">Hello, my name is</h4>
+      <h1 class="hero-name"style="font-size: 70px;"><span style="color: #f9004d;">Muzzammil</span><span style="color: #00ffae;"> Oloyede</span></h1>
+      <h2 class="hero-title">
+        I’m a <span class="animated-wrapper">
+          <span class="animated-role">Web Developer</span>
+          <span class="animated-role">Game Developer</span>
+          <span class="animated-role">Designer</span>
+        </span>
+      </h2>
+      
+    </div>
+  </div>
+
+  <!-- About Section -->
+  <section id="about" class="about-modern epic-about-section">
+    <h2 class="section-heading glitch-heading" data-text="About Me">
+    </h2>
+  
+    <div class="about-container">
+      <!-- Glowing image cards -->
+      <div class="image-card glowing-card" data-aos="fade-right">
+        <img src="./IMAGES/Photo on 8-16-24 at 5.07 PM.jpg" alt="Muzzammil in Kano">
+      </div>
+  
+      <div class="image-card glowing-card" data-aos="fade-left">
+        <img src="./family-photo.jpg" alt="Another moment">
+      </div>
+  
+      <!-- Futuristic animated text -->
+      <div class="about-text" data-aos="zoom-in">
+        <h2 class="animated-intro">👋 Meet <span class="highlight-green neon-flicker">Muzzammil</span></h2>
+        <h4 class="subtitle">Web & Game Developer <span class="rocket">🚀</span></h4>
+        <p class="bio-blur">I started coding at <strong>8</strong> and love building amazing <span class="text-glow">websites & games</span>.</p>
+        <p class="bio-blur">From <span class="highlight-green">Kano</span> to <span class="highlight-pink">Ilorin</span>, I carry <em>passion</em> in my fingertips and <em>creativity</em> in my heart. </p>
+        <div class="neon-o">
+        <a href="cv.html" class="explore-btn neon-button">Muzzamil Oloyede-CV</a>
+      </div>
+      </div>
+    </div>
+  </section>
+  
+  <section id="skills" class="service-modern epic-about-section">
+    <h2 class="section-heading glitch-heading" data-text="My Skills">
+      My <span class="text-glow-green">Skills</span>
+    </h2>
+    
+    <div class="card-grid">
+      <div class="glass-card skill-card" data-aos="fade-up">
+        <i class="fa-brands fa-html5" style="color: #ff5722;"></i>
+        <h3>HTML5</h3>
+        <p>Semantic tags, accessibility, and mobile-ready layouts.</p>
+      </div>
+  
+      <div class="glass-card skill-card" data-aos="fade-up" data-aos-delay="100">
+        <i class="fa-brands fa-css3-alt" style="color: #2965f1;"></i>
+        <h3>CSS3</h3>
+        <p>Beautiful UIs, animations, gradients, neon and glassmorphism.</p>
+      </div>
+  
+      <div class="glass-card skill-card" data-aos="fade-up" data-aos-delay="200">
+        <i class="fa-brands fa-js" style="color: #f7df1e;"></i>
+        <h3>JavaScript</h3>
+        <p>Dynamic interactivity, game logic, DOM control, and effects.</p>
+      </div>
+  
+      <div class="glass-card skill-card" data-aos="fade-up" data-aos-delay="300">
+        <i class="fa-solid fa-gamepad" style="color: #8bc34a;"></i>
+        <h3>Game Dev</h3>
+        <p>Canvas API, sprite animations, input & collision handling.</p>
+      </div>
+  
+      <div class="glass-card skill-card" data-aos="fade-up" data-aos-delay="400">
+        <i class="fa-brands fa-git-alt" style="color: #f1502f;"></i>
+        <h3>Git & GitHub</h3>
+        <p>Version control, branching, commits, and GitHub Pages.</p>
+      </div>
+  
+      <div class="glass-card skill-card" data-aos="fade-up" data-aos-delay="500">
+        <i class="fa-solid fa-code" style="color: #00e5ff;"></i>
+        <h3>Problem Solving</h3>
+        <p>Debugging, logical thinking, and breaking down challenges.</p>
+      </div>
+    </div>
+  </section>
+  
+
+  <!-- Learning Section -->
+  <section id="service" class="service-modern">
+<h2 class="section-heading">
+  <span class="text-glow-green">My</span> <span class="text-glow-pink">Passions & Projects</span>
+</h2>
+
+    <div class="card-grid">
+      <div class="glass-card" data-aos="zoom-in">
+        <i class="fa-solid fa-pills"></i>
+        <h3>Dangers of Drug Abuse</h3>
+        <p>My father's speech at Unilorin Secondary School inspired me deeply.</p>
+        <a href="abuse.html" class="card-btn">Read More</a>
+      </div>
+      <div class="glass-card" data-aos="zoom-in">
+        <i class="fa-solid fa-code"></i>
+        <h3>Web Development</h3>
+        <p>I love building responsive, clean websites that work beautifully everywhere.</p>
+        <a href="website.html" class="card-btn">Read More</a>
+      </div>
+      <div class="glass-card" data-aos="zoom-in">
+        <i class="fa-solid fa-gamepad"></i>
+        <h3>Game Development</h3>
+        <p>Games are my canvas. I bring wild ideas to life using HTML and JS. </p>
+        <a href="link.html" class="card-btn">Read More</a>
+      </div>
+    </div>
+  </section>
+  <section id="testimonials" class="epic-about-section">
+    <h2 class="section-heading glitch-heading" data-text="Testimonials">What People Say</h2>
+    <div class="card-grid">
+      <div class="glass-card skill-card" data-aos="fade-right">
+        <i class="fa-solid fa-user-astronaut"></i>
+        <h3>Proffessor Ishaq Oloyede(Grandpa)</h3>
+        <p>Muzzammil is a gifted coder! His game development skills are years ahead of his age.</p>
+      </div>
+      <div class="glass-card skill-card" data-aos="fade-left">
+        <i class="fa-solid fa-lightbulb"></i>
+        <h3>Proffessor Abdulkarim Oloyede(Dad)</h3>
+        <p>He turns complex code into stunning visuals. I love his web design energy!</p>
+      </div>
+      <div class="glass-card skill-card" data-aos="fade-right">
+        <i class="fa-solid fa-star"></i>
+        <h3>Little Brother</h3>
+        <p>Watching him build these projects from scratch is inspiring. Muzzamil is 🔥!</p>
+      </div>
+    </div>
+  </section>
+  
+ 
+  <section id="comments" style="padding: 4rem 2rem; text-align: center; background-color: #0f001a; color: white;">
+    <h2 class="section-heading text-glow-pink">Post a Comment</h2>
+    <div class="comment-container" style="
+      max-width: 700px;
+      margin: auto;
+      padding: 30px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 30px #00ffd544, 0 0 10px #f9004d33;
+      color: white;
+    ">
+      <p style="color: #aaa; font-size: 16px;">We are happy to hear from you</p>
+      <div class="head" style="margin: 10px 0; color: #aaa;">
+        <span id="comment-count">0</span> Comments
+      </div>
+  
+      <div class="comments" style="margin-top: 20px; text-align: left; line-height: 21.7px;"></div>
+  
+      <div class="commentbox" style="display: flex; gap: 10px; margin-top: 30px;">
+        <img class="selected-avatar-preview" src="./img1/user.png" alt="user" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #f9004d;">
+        <div class="contents" style="width: 100%;">
+          <h2 style="font-size: 17px;">Choose Avatar:</h2>
+          <div class="avatar-select" style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <img src="ava1.png" class="avatar-option" data-avatar="ava1.png" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;">
+            <img src="ava2.png" class="avatar-option" data-avatar="ava2.png" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;">
+            <img src="ava3.png" class="avatar-option" data-avatar="ava3.png" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;">
+            <img src="ava4.png" class="avatar-option" data-avatar="ava4.png" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;">
+            <img src="ava5.png" class="avatar-option" data-avatar="ava5.png" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;">
+            <img src="ava6.png" class="avatar-option" data-avatar="ava6.png" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;">
+          </div>
+          <input type="text" value="Anonymous" class="anonymous-input" style="width: 100%; margin-bottom: 10px; height: 30px;">
+          <input type="text" placeholder="Enter your comment" class="usercomment" style="width: 100%; margin-bottom: 20px; height: 30px;">
+          <button type="submit" disabled id="publish" class="neon-button">Publish</button>
+        </div>
+      </div>
+      
+    </div>
+  </section>
+
+  
+  
+
+  <footer>
+    &copy; 2025 Muzzamil Oloyede. All rights reserved. <br>
+    <div style="margin-top: 10px;">
+      <a href="mailto:muzzamiloloyede@gmail.com"><i class="fa-solid fa-envelope" style="color: #00ffae; margin-right: 10px;"></i></a>
+      <a href="https://github.com/muzzi205" target="_blank"><i class="fa-brands fa-github" style="color: #fff; margin-right: 10px;"></i></a>
+
+    </div>
+  </footer>
+  
+  <script>
+    let selectedAvatar = "./img1/user.png";
+  
+    // Avatar selection logic
+    document.querySelectorAll(".avatar-option").forEach((img) => {
+      img.addEventListener("click", () => {
+        selectedAvatar = img.dataset.avatar;
+        document.querySelector(".selected-avatar-preview").src = selectedAvatar;
+  
+        // Highlight selected avatar
+        document.querySelectorAll(".avatar-option").forEach(i => i.style.border = "none");
+        img.style.border = "2px solid #00ffae";
+      });
+    });
+  
+    const anonymousInput = document.querySelector(".anonymous-input");
+    const userComment = document.querySelector(".usercomment");
+    const publishBtn = document.querySelector("#publish");
+    const comments = document.querySelector(".comments");
+  
+    userComment.addEventListener("input", (e) => {
+      publishBtn.disabled = e.currentTarget.value === "";
+    });
+  
+    function addComment() {
+      const name = anonymousInput.value;
+      const message = userComment.value;
+      const date = new Date().toLocaleString();
+  
+      const publishedComment = `
+        <div class="parent" style="display: flex; gap: 10px; margin: 20px 0;">
+          <img src="${selectedAvatar}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
+          <div>
+            <h1 style="font-size: 14px;">${name}</h1>
+            <p style="font-size: 14px;">${message}</p>
+            <span style="font-size: 12px; color: gray;">${date}</span>
+          </div>
+        </div>
+      `;
+  
+      comments.innerHTML += publishedComment;
+      localStorage.setItem("comments", comments.innerHTML);
+      userComment.value = "";
+      anonymousInput.value = "Anonymous";
+      document.getElementById("comment-count").textContent = document.querySelectorAll(".parent").length;
+      publishBtn.disabled = true;
+    }
+  
+    publishBtn.addEventListener("click", addComment);
+  
+    window.addEventListener("DOMContentLoaded", () => {
+      comments.innerHTML = localStorage.getItem("comments") || "";
+      document.getElementById("comment-count").textContent = document.querySelectorAll(".parent").length;
+    });
+  </script>
+
+
+  
+  
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init();
+  </script>
+  <script>
+    window.addEventListener("load", () => {
+      const loader = document.getElementById("loader");
+      loader.style.transition = "opacity 1s ease";
+      loader.style.opacity = "0";
+      setTimeout(() => loader.style.display = "none", 1000);
+    });
+  </script>
+</body>
+</html>

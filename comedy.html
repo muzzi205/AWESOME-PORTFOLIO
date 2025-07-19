@@ -1,0 +1,544 @@
+<title>Muzzamils Laugh Labs</title>
+<link rel="icon" href="./IMAGES/favicon.png" type="image/x-icon" />
+<!-- ... (rest of your HTML remains unchanged above this section) ... -->
+<style>
+  /* === ULTRA CSS ENHANCEMENTS === */
+
+/* Neon Glow for Carousel */
+#spotlight-carousel {
+  box-shadow:
+    0 0 32px #00ffea99,
+    0 0 64px #f9004d33,
+    0 8px 32px 0 rgba(31,38,135,0.37);
+  border: 2.5px solid #00ffea;
+  animation: ultra-glow 2.5s linear infinite alternate;
+}
+
+@keyframes ultra-glow {
+  0% {
+    box-shadow:
+      0 0 32px #00ffea99,
+      0 0 64px #f9004d33,
+      0 8px 32px 0 rgba(31,38,135,0.37);
+    border-color: #00ffea;
+  }
+  100% {
+    box-shadow:
+      0 0 48px #f9004d99,
+      0 0 96px #00ffea33,
+      0 8px 32px 0 rgba(31,38,135,0.37);
+    border-color: #f9004d;
+  }
+}
+
+/* Animated Gradient for Joke Box */
+#carousel-joke {
+  background: linear-gradient(120deg, #f9004d55, #00ffea55, #ffdd5755);
+  background-size: 200% 200%;
+  animation: ultra-gradient 4s ease-in-out infinite;
+  text-shadow: 0 0 8px #fff, 0 0 16px #00ffea88;
+  border: 2px solid #ffdd57;
+}
+
+@keyframes ultra-gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Neon Buttons */
+#spotlight-carousel button,
+#carousel-random {
+  box-shadow: 0 0 12px #00ffea88, 0 0 24px #f9004d44;
+  border: 2px solid #00ffea;
+  background: linear-gradient(90deg, #1a1a2e 60%, #00ffea22 100%);
+  color: #00ffea;
+  transition: box-shadow 0.2s, color 0.2s, border-color 0.2s, background 0.2s;
+}
+
+#spotlight-carousel button:hover,
+#carousel-random:hover {
+  color: #fff700 !important;
+  border-color: #ffdd57;
+  background: linear-gradient(90deg, #f9004d44 40%, #00ffea44 100%);
+  box-shadow: 0 0 32px #ffdd57cc, 0 0 64px #00ffea99;
+  filter: brightness(1.2);
+}
+
+#spotlight-carousel button:active,
+#carousel-random:active {
+  color: #f9004d !important;
+  border-color: #f9004d;
+  background: #00ffea33;
+  box-shadow: 0 0 16px #f9004dcc, 0 0 32px #00ffea99;
+}
+
+/* Glowing Indicator */
+#carousel-indicator {
+  text-shadow: 0 0 8px #ffdd57cc, 0 0 16px #00ffea88;
+  animation: indicator-glow 2s infinite alternate;
+}
+@keyframes indicator-glow {
+  0% { text-shadow: 0 0 8px #ffdd57cc, 0 0 16px #00ffea88; }
+  100% { text-shadow: 0 0 16px #ffdd57, 0 0 32px #00ffea; }
+}
+
+/* Ultra Poll Styles */
+#poll-form, .poll-form {
+  box-shadow: 0 0 24px #00ffea99, 0 0 48px #f9004d44;
+  border: 2px solid #ffdd57;
+  background: linear-gradient(120deg, #1a1a2e 60%, #f9004d22 100%);
+  animation: ultra-gradient 6s ease-in-out infinite;
+}
+
+#poll-form label, .poll-form label {
+  text-shadow: 0 0 6px #ffdd57cc;
+}
+
+#poll-form button[type="submit"] {
+  box-shadow: 0 0 16px #00ffea99, 0 0 32px #f9004d44;
+  border: 2px solid #00ffea;
+  background: linear-gradient(90deg, #00ffea 40%, #f9004d 100%);
+  color: #fff;
+  transition: box-shadow 0.2s, border-color 0.2s, background 0.2s;
+}
+
+#poll-form button[type="submit"]:hover {
+  background: linear-gradient(90deg, #f9004d 40%, #00ffea 100%);
+  color: #fff700;
+  border-color: #ffdd57;
+  box-shadow: 0 0 32px #ffdd57cc, 0 0 64px #00ffea99;
+}
+
+/* Poll Result Glow */
+#poll-result {
+  text-shadow: 0 0 8px #00ffea88, 0 0 16px #ffdd57cc;
+  border: 2px solid #00ffea;
+  background: linear-gradient(90deg, #16213e 60%, #00ffea22 100%);
+  animation: indicator-glow 3s infinite alternate;
+}
+
+/* Ultra Fun Fact Section */
+#fun-fact-section, .fun-fact-section {
+  box-shadow: 0 0 24px #f9004d99, 0 0 48px #00ffea44;
+  border: 2px solid #f9004d;
+  background: linear-gradient(120deg, #1a1a2e 60%, #00ffea22 100%);
+  animation: ultra-gradient 8s ease-in-out infinite;
+}
+
+#fun-fact-text {
+  text-shadow: 0 0 8px #ffdd57cc, 0 0 16px #00ffea88;
+  animation: indicator-glow 2.5s infinite alternate;
+}
+
+#new-fun-fact {
+  box-shadow: 0 0 16px #f9004d99, 0 0 32px #00ffea44;
+  border: 2px solid #f9004d;
+  background: linear-gradient(90deg, #00ffea 40%, #f9004d 100%);
+  color: #fff;
+  transition: box-shadow 0.2s, border-color 0.2s, background 0.2s;
+}
+
+#new-fun-fact:hover {
+  background: linear-gradient(90deg, #f9004d 40%, #00ffea 100%);
+  color: #fff700;
+  border-color: #ffdd57;
+  box-shadow: 0 0 32px #ffdd57cc, 0 0 64px #00ffea99;
+}
+
+/* Animated Pulse for Main Content */
+#main-content, .main-content {
+  animation: ultra-pulse 8s infinite alternate;
+}
+@keyframes ultra-pulse {
+  0% { filter: brightness(1) drop-shadow(0 0 0 #00ffea); }
+  100% { filter: brightness(1.08) drop-shadow(0 0 16px #00ffea88); }
+}
+
+/* Ultra Animated Background */
+body::before {
+  background:
+    repeating-radial-gradient(circle at 20% 30%, #00ffea55 0, #00ffea22 40px, transparent 80px),
+    repeating-radial-gradient(circle at 80% 70%, #f9004d55 0, #f9004d22 40px, transparent 80px),
+    linear-gradient(135deg, #0f2027 0%, #2c5364 100%);
+  opacity: 0.85;
+  animation: bgmove 18s linear infinite alternate, ultra-bgcolor 12s ease-in-out infinite alternate;
+}
+
+@keyframes ultra-bgcolor {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(60deg); }
+}
+
+/* Ultra Responsive Tweaks */
+@media (max-width: 700px) {
+  #spotlight-carousel,
+  #carousel-joke,
+  #poll-form, .poll-form,
+  #fun-fact-section, .fun-fact-section {
+    box-shadow: 0 0 12px #00ffea99, 0 0 24px #f9004d44;
+    border-width: 1.5px;
+    animation-duration: 12s;
+  }
+}
+
+/* === END ULTRA CSS ENHANCEMENTS === */
+  /* Reset and base styles */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', 'Comic Sans MS', Arial, sans-serif;
+  background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%);
+  min-height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  min-height: 100vh;
+  min-width: 100vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Main container to center everything */
+#main-content, .main-content {
+  width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 0;
+}
+
+/* Carousel Styles */
+#spotlight-carousel {
+  width: 90vw;
+  max-width: 700px;
+  min-height: 120px;
+  background: linear-gradient(120deg, #1a1a2e 60%, #16213e 100%);
+  border-radius: 18px;
+  box-shadow: 0 8px 32px 0 rgba(31,38,135,0.37);
+  border: 1.5px solid #00ffea44;
+  padding: 2rem 2.5rem;
+  margin: 2rem 0 1rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  position: relative;
+  transition: box-shadow 0.2s;
+}
+
+#spotlight-carousel:hover {
+  box-shadow: 0 0 32px #00ffea55, 0 8px 32px 0 rgba(31,38,135,0.37);
+}
+
+#carousel-joke {
+  flex: 1;
+  background: linear-gradient(120deg, #f9004d33, #00ffea33);
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  min-height: 80px;
+  font-size: 1.3rem;
+  color: #fff;
+  box-shadow: 0 0 12px #f9004d55;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  transition: background 0.3s;
+}
+
+#carousel-indicator {
+  color: #ffdd57;
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+  margin-top: 0.5rem;
+  text-shadow: 0 1px 4px #000a;
+}
+
+/* Carousel Buttons */
+#spotlight-carousel button {
+  background: none;
+  border: none;
+  font-size: 2.2rem;
+  color: #00ffea;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 50%;
+  transition: background 0.2s, color 0.2s, transform 0.1s;
+  outline: none;
+  box-shadow: 0 0 0 transparent;
+}
+
+#spotlight-carousel button:active {
+  background: #00ffea22;
+  color: #f9004d;
+  transform: scale(0.95);
+}
+
+#carousel-random {
+  color: #ffdd57 !important;
+  font-size: 1.7rem !important;
+  margin-left: 0.5rem;
+  transition: color 0.2s;
+}
+
+#carousel-random:hover {
+  color: #fff700 !important;
+  background: #ffdd5722;
+}
+
+/* Poll Styles */
+#poll-form, .poll-form {
+  background: #1a1a2e;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px #00ffea33;
+  padding: 1.5rem 2rem;
+  margin: 2rem 0 1rem 0;
+  color: #fff;
+  width: 90vw;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#poll-form label, .poll-form label {
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+  color: #ffdd57;
+}
+
+#poll-form input[type="radio"] {
+  accent-color: #00ffea;
+  margin-right: 0.5em;
+}
+
+#poll-form button[type="submit"] {
+  margin-top: 1.2rem;
+  background: linear-gradient(90deg, #00ffea 40%, #f9004d 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 2rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #00ffea33;
+  transition: background 0.2s, color 0.2s;
+}
+
+#poll-form button[type="submit"]:hover {
+  background: linear-gradient(90deg, #f9004d 40%, #00ffea 100%);
+  color: #fff700;
+}
+
+#poll-result {
+  margin: 1rem 0 0.5rem 0;
+  color: #fff;
+  font-size: 1.1rem;
+  text-align: center;
+  background: #16213e;
+  border-radius: 8px;
+  padding: 0.7rem 1.2rem;
+  box-shadow: 0 1px 6px #00ffea22;
+}
+
+/* Fun Fact Styles */
+#fun-fact-section, .fun-fact-section {
+  background: #1a1a2e;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px #f9004d33;
+  padding: 1.5rem 2rem;
+  margin: 2rem 0 1rem 0;
+  color: #fff;
+  width: 90vw;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#fun-fact-text {
+  font-size: 1.1rem;
+  color: #ffdd57;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+#new-fun-fact {
+  background: linear-gradient(90deg, #00ffea 40%, #f9004d 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #f9004d33;
+  transition: background 0.2s, color 0.2s;
+}
+
+#new-fun-fact:hover {
+  background: linear-gradient(90deg, #f9004d 40%, #00ffea 100%);
+  color: #fff700;
+}
+
+/* Responsive Design */
+@media (max-width: 700px) {
+  #spotlight-carousel {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.2rem 0.5rem;
+    min-width: 0;
+    width: 98vw;
+    max-width: 98vw;
+  }
+  #carousel-joke {
+    font-size: 1.05rem;
+    padding: 1rem 0.5rem;
+    min-width: 0;
+    width: 90vw;
+    max-width: 90vw;
+  }
+  #poll-form, .poll-form, #fun-fact-section, .fun-fact-section {
+    padding: 1rem 0.5rem;
+    width: 98vw;
+    max-width: 98vw;
+  }
+}
+
+/* Optional: Add a fun animated background effect */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: -1;
+  background: repeating-radial-gradient(circle at 20% 30%, #00ffea22 0, #00ffea11 40px, transparent 80px),
+              repeating-radial-gradient(circle at 80% 70%, #f9004d22 0, #f9004d11 40px, transparent 80px);
+  opacity: 0.7;
+  pointer-events: none;
+  animation: bgmove 18s linear infinite alternate;
+}
+
+@keyframes bgmove {
+  0% { background-position: 0 0, 100% 100%; }
+  100% { background-position: 100px 80px, 0 0; }
+}
+</style>
+<!-- Carousel -->
+<div id="spotlight-carousel" style="display:flex; align-items:center; justify-content:center; gap:1.5rem; margin-bottom:2rem;">
+  <button id="carousel-prev" aria-label="Previous joke" style="background:none; border:none; font-size:2rem; color:#00ffea; cursor:pointer;">&#8678;</button>
+  <div id="carousel-joke" style="flex:1; background:linear-gradient(120deg,#f9004d22,#00ffea22); border-radius:12px; padding:1.2rem 2rem; min-height:80px; font-size:1.2rem; color:#fff; box-shadow:0 0 8px #f9004d55;">
+    <!-- Joke will appear here -->
+  </div>
+  <button id="carousel-next" aria-label="Next joke" style="background:none; border:none; font-size:2rem; color:#00ffea; cursor:pointer;">&#8680;</button>
+  <button id="carousel-random" aria-label="Random joke" style="background:none; border:none; font-size:1.7rem; color:#ffdd57; cursor:pointer;" title="Show a random joke">&#127922;</button>
+</div>
+<div style="text-align:center; margin-bottom:2rem;">
+  <span id="carousel-indicator" style="color:#ffdd57; font-size:1rem;"></span>
+</div>
+
+<!-- ... (rest of your HTML remains unchanged below this section) ... -->
+
+<script>
+  // Carousel logic
+  const spotlightJokes = [
+    "Why did the math book look sad? Because it had too many problems.",
+    "Parallel lines have so much in common. It’s a shame they’ll never meet.",
+    "I told my wife she was drawing her eyebrows too high. She looked surprised.",
+    "Why don’t skeletons fight each other? They don’t have the guts.",
+    "I’m reading a book on anti-gravity. It’s impossible to put down!",
+    "Why did the scarecrow win an award? Because he was outstanding in his field.",
+    "Why can't you hear a pterodactyl go to the bathroom? Because the 'P' is silent.",
+    "Did you hear about the claustrophobic astronaut? He just needed a little space.",
+    "Why did the golfer bring two pairs of pants? In case he got a hole in one.",
+    "Why did the bicycle fall over? Because it was two-tired.",
+    "What do you call fake spaghetti? An impasta.",
+    "Why did the chicken join a band? Because it had the drumsticks.",
+    "Why don’t scientists trust atoms? Because they make up everything.",
+    "Why did the computer go to the doctor? Because it had a virus.",
+    "Why did the tomato turn red? Because it saw the salad dressing."
+  ];
+  let carouselIndex = 0;
+  const carouselJoke = document.getElementById('carousel-joke');
+  const carouselIndicator = document.getElementById('carousel-indicator');
+  function updateCarousel() {
+    carouselJoke.textContent = spotlightJokes[carouselIndex];
+    carouselIndicator.textContent = `Joke ${carouselIndex+1} of ${spotlightJokes.length}`;
+  }
+  document.getElementById('carousel-prev').onclick = () => {
+    carouselIndex = (carouselIndex - 1 + spotlightJokes.length) % spotlightJokes.length;
+    updateCarousel();
+  };
+  document.getElementById('carousel-next').onclick = () => {
+    carouselIndex = (carouselIndex + 1) % spotlightJokes.length;
+    updateCarousel();
+  };
+  // Random Joke Button
+  document.getElementById('carousel-random').onclick = () => {
+    let randomIndex;
+    do {
+      randomIndex = Math.floor(Math.random() * spotlightJokes.length);
+    } while (randomIndex === carouselIndex && spotlightJokes.length > 1);
+    carouselIndex = randomIndex;
+    updateCarousel();
+  };
+  updateCarousel();
+
+  // Comedy Poll logic
+  const pollForm = document.getElementById('poll-form');
+  const pollResult = document.getElementById('poll-result');
+  const pollKey = 'comedyPollVotes';
+  let pollVotes = JSON.parse(localStorage.getItem(pollKey)) || {
+    "Puns": 0, "Dad Jokes": 0, "Observational": 0, "Dark Humor": 0, "Slapstick": 0
+  };
+  pollForm.onsubmit = function(e) {
+    e.preventDefault();
+    const genre = pollForm.genre.value;
+    if (!genre) {
+      pollResult.textContent = "Please select a genre!";
+      return;
+    }
+    pollVotes[genre] = (pollVotes[genre] || 0) + 1;
+    localStorage.setItem(pollKey, JSON.stringify(pollVotes));
+    showPollResults();
+  };
+  function showPollResults() {
+    let total = Object.values(pollVotes).reduce((a,b)=>a+b,0);
+    if (total === 0) {
+      pollResult.textContent = "No votes yet. Be the first!";
+      return;
+    }
+    pollResult.innerHTML = Object.entries(pollVotes).map(([genre, count]) => {
+      const percent = ((count/total)*100).toFixed(1);
+      return `<b>${genre}</b>: ${count} (${percent}%)`;
+    }).join(' &nbsp;|&nbsp; ');
+  }
+  showPollResults();
+
+  // Comedy Fun Fact logic
+  const funFacts = [
+    "The world’s longest stand-up comedy show lasted over 40 hours!",
+    "Charlie Chaplin once lost a Charlie Chaplin lookalike contest.",
+    "Laughter boosts your immune system and reduces stress hormones.",
+    "The first joke ever recorded dates back to 1900 BC in ancient Sumer.",
+    "Comedians have their own 'Comedy Olympics' called the Edinburgh Fringe Festival."
+  ];
+  const funFactText = document.getElementById('fun-fact-text');
+  const newFunFactBtn = document.getElementById('new-fun-fact');
+  function showRandomFunFact() {
+    funFactText.textContent = funFacts[Math.floor(Math.random()*funFacts.length)];
+  }
+  newFunFactBtn.onclick = showRandomFunFact;
+  showRandomFunFact();
+</script>
