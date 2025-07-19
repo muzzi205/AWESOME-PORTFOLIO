@@ -377,17 +377,150 @@ color: transparent;
 }
 
 
+    /* Mobile Responsive Styles */
     @media (max-width: 768px) {
-      .hero-content h1 {
-        font-size: 50px;
+      .nav-glass {
+        padding: 15px 20px;
+        flex-direction: column;
+        gap: 15px;
       }
 
-      .hero-content h2 {
-        font-size: 20px;
+      .nav-links {
+        gap: 20px;
+        margin-right: 0;
+        font-size: 16px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .hero-modern {
+        padding-left: 20px;
+        text-align: center;
+      }
+
+      .hero-content {
+        margin-left: 0;
+        padding: 0 20px;
+      }
+
+      .hero-content h4 {
+        font-size: 24px !important;
+      }
+
+      .hero-content h1 {
+        font-size: 40px !important;
+      }
+
+      .hero-title {
+        font-size: 32px !important;
       }
 
       .section-heading {
-        font-size: 36px;
+        font-size: 32px;
+      }
+
+      .about-text h2 {
+        font-size: 28px;
+      }
+
+      .about-text .subtitle {
+        font-size: 18px;
+      }
+
+      .image-card img {
+        width: 250px;
+      }
+
+      .glass-card {
+        width: 280px;
+        padding: 20px;
+      }
+
+      .about-modern, .service-modern {
+        padding: 50px 20px;
+      }
+
+      .card-grid {
+        gap: 20px;
+      }
+
+      .about-container {
+        gap: 30px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .nav-links {
+        font-size: 14px;
+        gap: 15px;
+      }
+
+      .hero-content h4 {
+        font-size: 20px !important;
+      }
+
+      .hero-content h1 {
+        font-size: 32px !important;
+      }
+
+      .hero-title {
+        font-size: 24px !important;
+      }
+
+      .section-heading {
+        font-size: 28px;
+      }
+
+      .image-card img {
+        width: 200px;
+      }
+
+      .glass-card {
+        width: 100%;
+        max-width: 300px;
+        padding: 15px;
+      }
+
+      .about-text {
+        padding: 1.5rem;
+      }
+
+      .animated-intro {
+        font-size: 1.5rem;
+      }
+
+      .comment-container {
+        padding: 20px !important;
+        margin: 0 10px !important;
+      }
+
+      .avatar-select {
+        flex-wrap: wrap !important;
+      }
+
+      .commentbox {
+        flex-direction: column !important;
+        gap: 15px !important;
+      }
+    }
+
+    /* Tablet Responsive */
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .hero-content {
+        margin-left: 100px;
+      }
+
+      .hero-title {
+        font-size: 50px;
+      }
+
+      .nav-links {
+        gap: 40px;
+        margin-right: 50px;
+      }
+
+      .glass-card {
+        width: 280px;
       }
     }
 /* Main Section Glow Background */
@@ -604,7 +737,7 @@ footer a:hover {
         <h3>CSS3</h3>
         <p>Beautiful UIs, animations, gradients, neon and glassmorphism.</p>
       </div>
-  
+   
       <div class="glass-card skill-card" data-aos="fade-up" data-aos-delay="200">
         <i class="fa-brands fa-js" style="color: #f7df1e;"></i>
         <h3>JavaScript</h3>
