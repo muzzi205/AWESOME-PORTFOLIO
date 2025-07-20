@@ -869,6 +869,8 @@ footer a:hover {
   
   <script>
     let selectedAvatar = "./img1/user.png";
+    const COMMENTS_API = 'https://api.jsonbin.io/v3/b/679431bead19ca34f8e94af0';
+    const API_KEY = '$2a$10$8Kt6wXF2oO.JdzQVbMJG4OsZVgwOUIZiPH5PQmN3QrGCcKNcU4tOi';
   
     // Avatar selection logic
     document.querySelectorAll(".avatar-option").forEach((img) => {
@@ -890,37 +892,133 @@ footer a:hover {
     userComment.addEventListener("input", (e) => {
       publishBtn.disabled = e.currentTarget.value === "";
     });
+
+    // Load comments from shared database
+    async function loadComments() {
+      try {
+        const response = await fetch(COMMENTS_API + '/latest', {
+          method: 'GET',
+          headers: {
+            'X-Master-Key': API_KEY,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          const commentsData = data.record.comments || [];
+          
+          // Display all comments
+          comments.innerHTML = '';
+          commentsData.forEach(comment => {
+            const publishedComment = `
+              <div class="parent" style="display: flex; gap: 10px; margin: 20px 0;">
+                <img src="${comment.avatar}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
+                <div>
+                  <h1 style="font-size: 14px;">${comment.name}</h1>
+                  <p style="font-size: 14px;">${comment.message}</p>
+                  <span style="font-size: 12px; color: gray;">${comment.date}</span>
+                </div>
+              </div>
+            `;
+            comments.innerHTML += publishedComment;
+          });
+          
+          document.getElementById("comment-count").textContent = commentsData.length;
+        }
+      } catch (error) {
+        console.log('Loading from localStorage as fallback...');
+        // Fallback to localStorage
+        comments.innerHTML = localStorage.getItem("comments") || "";
+        document.getElementById("comment-count").textContent = document.querySelectorAll(".parent").length;
+      }
+    }
+
+    // Save comment to shared database
+    async function saveComment(commentData) {
+      try {
+        // First get existing comments
+        const getResponse = await fetch(COMMENTS_API + '/latest', {
+          method: 'GET',
+          headers: {
+            'X-Master-Key': API_KEY,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        let existingComments = [];
+        if (getResponse.ok) {
+          const data = await getResponse.json();
+          existingComments = data.record.comments || [];
+        }
+        
+        // Add new comment
+        existingComments.push(commentData);
+        
+        // Save back to database
+        const saveResponse = await fetch(COMMENTS_API, {
+          method: 'PUT',
+          headers: {
+            'X-Master-Key': API_KEY,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ comments: existingComments })
+        });
+        
+        if (saveResponse.ok) {
+          console.log('Comment saved successfully!');
+          loadComments(); // Refresh comments
+        }
+      } catch (error) {
+        console.log('Failed to save to database, saving locally...');
+        // Fallback to localStorage
+        const publishedComment = `
+          <div class="parent" style="display: flex; gap: 10px; margin: 20px 0;">
+            <img src="${commentData.avatar}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
+            <div>
+              <h1 style="font-size: 14px;">${commentData.name}</h1>
+              <p style="font-size: 14px;">${commentData.message}</p>
+              <span style="font-size: 12px; color: gray;">${commentData.date}</span>
+            </div>
+          </div>
+        `;
+        comments.innerHTML += publishedComment;
+        localStorage.setItem("comments", comments.innerHTML);
+        document.getElementById("comment-count").textContent = document.querySelectorAll(".parent").length;
+      }
+    }
   
-    function addComment() {
+    async function addComment() {
       const name = anonymousInput.value;
       const message = userComment.value;
       const date = new Date().toLocaleString();
-  
-      const publishedComment = `
-        <div class="parent" style="display: flex; gap: 10px; margin: 20px 0;">
-          <img src="${selectedAvatar}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
-          <div>
-            <h1 style="font-size: 14px;">${name}</h1>
-            <p style="font-size: 14px;">${message}</p>
-            <span style="font-size: 12px; color: gray;">${date}</span>
-          </div>
-        </div>
-      `;
-  
-      comments.innerHTML += publishedComment;
-      localStorage.setItem("comments", comments.innerHTML);
+      
+      const commentData = {
+        name: name,
+        message: message,
+        date: date,
+        avatar: selectedAvatar,
+        id: Date.now() // Simple ID
+      };
+      
+      // Save to shared database
+      await saveComment(commentData);
+      
+      // Clear form
       userComment.value = "";
       anonymousInput.value = "Anonymous";
-      document.getElementById("comment-count").textContent = document.querySelectorAll(".parent").length;
       publishBtn.disabled = true;
     }
   
     publishBtn.addEventListener("click", addComment);
   
+    // Load comments when page loads
     window.addEventListener("DOMContentLoaded", () => {
-      comments.innerHTML = localStorage.getItem("comments") || "";
-      document.getElementById("comment-count").textContent = document.querySelectorAll(".parent").length;
+      loadComments();
     });
+    
+    // Refresh comments every 30 seconds to show new comments from other users
+    setInterval(loadComments, 30000);
   </script>
 
 
