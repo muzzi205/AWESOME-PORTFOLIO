@@ -66,8 +66,8 @@
   <script>
     let selectedAvatar = "./img1/user.png";
     
-    // Firebase Realtime Database URL for shared comments
-    const FIREBASE_URL = 'https://awesome-portfolio-comments-default-rtdb.firebaseio.com/comments.json';
+    // Use localStorage for now - will implement shared system later
+    const COMMENTS_KEY = 'portfolio-comments-v2';
   
     // Avatar selection logic
     document.querySelectorAll(".avatar-option").forEach((img) => {
@@ -114,41 +114,24 @@
       }, 3000);
     }
 
-    // Load comments from Firebase
-    async function loadComments() {
+    // Load comments from localStorage
+    function loadComments() {
       try {
-        showMessage('Loading comments...', 'info');
-        
-        const response = await fetch(FIREBASE_URL);
-        if (response.ok) {
-          const data = await response.json();
-          const commentsArray = data ? Object.values(data) : [];
-          displayComments(commentsArray);
-          console.log('Comments loaded from shared database');
-        } else {
-          throw new Error('Failed to load comments');
-        }
-      } catch (error) {
-        console.log('Error loading shared comments, using local fallback:', error);
-        loadLocalComments();
-      }
-    }
-    
-    // Fallback to localStorage
-    function loadLocalComments() {
-      try {
-        const savedComments = localStorage.getItem("portfolio-comments");
+        const savedComments = localStorage.getItem(COMMENTS_KEY);
         if (savedComments) {
           const commentsData = JSON.parse(savedComments);
           displayComments(commentsData);
+          console.log('Comments loaded from localStorage');
         } else {
           displayComments([]);
+          console.log('No saved comments found');
         }
       } catch (error) {
-        console.log('Error loading local comments:', error);
+        console.log('Error loading comments:', error);
         displayComments([]);
       }
     }
+    
 
     // Display comments in the UI
     function displayComments(commentsArray) {
@@ -171,42 +154,22 @@
       document.getElementById("comment-count").textContent = commentsArray.length;
     }
 
-    // Save comment to Firebase
-    async function saveCommentToFirebase(commentData) {
+    // Save comment locally
+    function saveComment(commentData) {
       try {
-        const response = await fetch(FIREBASE_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(commentData)
-        });
-        
-        if (response.ok) {
-          showMessage('Comment posted successfully!', 'success');
-          return true;
-        } else {
-          throw new Error('Failed to save comment');
-        }
+        const existingComments = JSON.parse(localStorage.getItem(COMMENTS_KEY) || "[]");
+        existingComments.push(commentData);
+        localStorage.setItem(COMMENTS_KEY, JSON.stringify(existingComments));
+        showMessage('Comment posted successfully!', 'success');
+        return true;
       } catch (error) {
-        console.error('Error saving to Firebase:', error);
-        showMessage('Error posting comment, saved locally', 'error');
+        console.error('Error saving comment:', error);
+        showMessage('Error posting comment', 'error');
         return false;
       }
     }
-
-    // Save comment locally as backup
-    function saveCommentLocally(commentData) {
-      try {
-        const existingComments = JSON.parse(localStorage.getItem("portfolio-comments") || "[]");
-        existingComments.push(commentData);
-        localStorage.setItem("portfolio-comments", JSON.stringify(existingComments));
-      } catch (error) {
-        console.error('Error saving locally:', error);
-      }
-    }
   
-    async function addComment() {
+    function addComment() {
       const name = anonymousInput.value;
       const message = userComment.value;
       const date = new Date().toLocaleString();
@@ -222,18 +185,18 @@
         timestamp: Date.now()
       };
       
-      // Try to save to Firebase first
-      const saved = await saveCommentToFirebase(commentData);
+      // Save comment
+      const saved = saveComment(commentData);
       
-      // Always save locally as backup
-      saveCommentLocally(commentData);
+      if (saved) {
+        // Reload comments to show the new one
+        loadComments();
+        
+        // Reset form
+        userComment.value = "";
+        anonymousInput.value = "Anonymous";
+      }
       
-      // Reload comments to show the new one
-      await loadComments();
-      
-      // Reset form
-      userComment.value = "";
-      anonymousInput.value = "Anonymous";
       publishBtn.disabled = true;
       publishBtn.textContent = 'Publish';
     }
