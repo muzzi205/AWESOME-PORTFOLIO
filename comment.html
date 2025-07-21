@@ -65,6 +65,9 @@
   </section>
   <script>
     let selectedAvatar = "./img1/user.png";
+    
+    // Firebase Realtime Database URL for shared comments
+    const FIREBASE_URL = 'https://awesome-portfolio-comments-default-rtdb.firebaseio.com/comments.json';
   
     // Avatar selection logic
     document.querySelectorAll(".avatar-option").forEach((img) => {
@@ -86,37 +89,164 @@
     userComment.addEventListener("input", (e) => {
       publishBtn.disabled = e.currentTarget.value === "";
     });
+
+    // Show message to user
+    function showMessage(message, type = 'info') {
+      const messageDiv = document.createElement('div');
+      messageDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 10px 20px;
+        border-radius: 5px;
+        color: white;
+        font-weight: bold;
+        z-index: 1000;
+        ${type === 'success' ? 'background-color: #28a745;' : 
+          type === 'error' ? 'background-color: #dc3545;' : 
+          'background-color: #007bff;'}
+      `;
+      messageDiv.textContent = message;
+      document.body.appendChild(messageDiv);
+      
+      setTimeout(() => {
+        document.body.removeChild(messageDiv);
+      }, 3000);
+    }
+
+    // Load comments from Firebase
+    async function loadComments() {
+      try {
+        showMessage('Loading comments...', 'info');
+        
+        const response = await fetch(FIREBASE_URL);
+        if (response.ok) {
+          const data = await response.json();
+          const commentsArray = data ? Object.values(data) : [];
+          displayComments(commentsArray);
+          console.log('Comments loaded from shared database');
+        } else {
+          throw new Error('Failed to load comments');
+        }
+      } catch (error) {
+        console.log('Error loading shared comments, using local fallback:', error);
+        loadLocalComments();
+      }
+    }
+    
+    // Fallback to localStorage
+    function loadLocalComments() {
+      try {
+        const savedComments = localStorage.getItem("portfolio-comments");
+        if (savedComments) {
+          const commentsData = JSON.parse(savedComments);
+          displayComments(commentsData);
+        } else {
+          displayComments([]);
+        }
+      } catch (error) {
+        console.log('Error loading local comments:', error);
+        displayComments([]);
+      }
+    }
+
+    // Display comments in the UI
+    function displayComments(commentsArray) {
+      comments.innerHTML = '';
+      
+      commentsArray.forEach(comment => {
+        const commentHTML = `
+          <div class="parent" style="display: flex; gap: 10px; margin: 20px 0;">
+            <img src="${comment.avatar}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
+            <div>
+              <h1 style="font-size: 14px;">${comment.name}</h1>
+              <p style="font-size: 14px;">${comment.message}</p>
+              <span style="font-size: 12px; color: gray;">${comment.date}</span>
+            </div>
+          </div>
+        `;
+        comments.innerHTML += commentHTML;
+      });
+      
+      document.getElementById("comment-count").textContent = commentsArray.length;
+    }
+
+    // Save comment to Firebase
+    async function saveCommentToFirebase(commentData) {
+      try {
+        const response = await fetch(FIREBASE_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(commentData)
+        });
+        
+        if (response.ok) {
+          showMessage('Comment posted successfully!', 'success');
+          return true;
+        } else {
+          throw new Error('Failed to save comment');
+        }
+      } catch (error) {
+        console.error('Error saving to Firebase:', error);
+        showMessage('Error posting comment, saved locally', 'error');
+        return false;
+      }
+    }
+
+    // Save comment locally as backup
+    function saveCommentLocally(commentData) {
+      try {
+        const existingComments = JSON.parse(localStorage.getItem("portfolio-comments") || "[]");
+        existingComments.push(commentData);
+        localStorage.setItem("portfolio-comments", JSON.stringify(existingComments));
+      } catch (error) {
+        console.error('Error saving locally:', error);
+      }
+    }
   
-    function addComment() {
+    async function addComment() {
       const name = anonymousInput.value;
       const message = userComment.value;
       const date = new Date().toLocaleString();
-  
-      const publishedComment = `
-        <div class="parent" style="display: flex; gap: 10px; margin: 20px 0;">
-          <img src="${selectedAvatar}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
-          <div>
-            <h1 style="font-size: 14px;">${name}</h1>
-            <p style="font-size: 14px;">${message}</p>
-            <span style="font-size: 12px; color: gray;">${date}</span>
-          </div>
-        </div>
-      `;
-  
-      comments.innerHTML += publishedComment;
-      localStorage.setItem("comments", comments.innerHTML);
+      
+      publishBtn.disabled = true;
+      publishBtn.textContent = 'Publishing...';
+      
+      const commentData = {
+        name: name,
+        message: message,
+        date: date,
+        avatar: selectedAvatar,
+        timestamp: Date.now()
+      };
+      
+      // Try to save to Firebase first
+      const saved = await saveCommentToFirebase(commentData);
+      
+      // Always save locally as backup
+      saveCommentLocally(commentData);
+      
+      // Reload comments to show the new one
+      await loadComments();
+      
+      // Reset form
       userComment.value = "";
       anonymousInput.value = "Anonymous";
-      document.getElementById("comment-count").textContent = document.querySelectorAll(".parent").length;
       publishBtn.disabled = true;
+      publishBtn.textContent = 'Publish';
     }
   
     publishBtn.addEventListener("click", addComment);
   
+    // Load comments when page loads
     window.addEventListener("DOMContentLoaded", () => {
-      comments.innerHTML = localStorage.getItem("comments") || "";
-      document.getElementById("comment-count").textContent = document.querySelectorAll(".parent").length;
+      loadComments();
     });
+    
+    // Refresh comments every 30 seconds to see new comments from other users
+    setInterval(loadComments, 30000);
   </script>
 </body>
 </html>
