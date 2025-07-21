@@ -66,10 +66,12 @@
   <script>
     let selectedAvatar = "./img1/user.png";
     
-    // Shared comments using JSONBin.io public API
-    const API_URL = 'https://api.jsonbin.io/v3/b/679675b5ad19ca34f8d82b7b';
-    const API_KEY = '$2a$10$QyJ3v9Kh.0fYPH7XpQy2S.YN6xXw8LzVk7dM4nB2rQ3pT8hG5cF1y';
-    const COMMENTS_KEY = 'portfolio-comments-local-backup';
+    // Shared comments using Firebase Realtime Database (free tier)
+    const FIREBASE_URL = 'https://awesome-portfolio-comments-default-rtdb.firebaseio.com/comments.json';
+    const COMMENTS_KEY = 'portfolio-comments-backup';
+    
+    // Session ID for tracking
+    const SESSION_ID = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
   
     // Avatar selection logic
     document.querySelectorAll(".avatar-option").forEach((img) => {
@@ -116,49 +118,42 @@
       }, 3000);
     }
 
-    // Load comments from shared API
+    // Load comments from Firebase (shared) with localStorage fallback
     async function loadComments() {
       try {
         showMessage('Loading comments...', 'info');
         
-        const response = await fetch(API_URL, {
-          method: 'GET',
-          headers: {
-            'X-Master-Key': API_KEY
-          }
-        });
-        
+        const response = await fetch(FIREBASE_URL);
         if (response.ok) {
           const data = await response.json();
-          const commentsArray = data.record.comments || [];
+          const commentsArray = data ? Object.values(data).sort((a, b) => a.timestamp - b.timestamp) : [];
           displayComments(commentsArray);
+          console.log('✅ Comments loaded from shared database - everyone can see these!');
           
-          // Also save locally as backup
+          // Also save as local backup
           localStorage.setItem(COMMENTS_KEY, JSON.stringify(commentsArray));
-          console.log('Comments loaded from shared database');
         } else {
-          throw new Error('Failed to load from server');
+          throw new Error('Failed to load shared comments');
         }
       } catch (error) {
-        console.log('Error loading shared comments, using local backup:', error);
-        loadLocalBackup();
+        console.log('⚠️ Error loading shared comments, using local fallback:', error);
+        showMessage('Using local comments - sharing temporarily unavailable', 'error');
+        loadLocalComments();
       }
     }
     
-    // Fallback to local backup
-    function loadLocalBackup() {
+    // Fallback to localStorage
+    function loadLocalComments() {
       try {
         const savedComments = localStorage.getItem(COMMENTS_KEY);
         if (savedComments) {
           const commentsData = JSON.parse(savedComments);
           displayComments(commentsData);
-          showMessage('Loaded comments from local backup', 'info');
         } else {
           displayComments([]);
-          showMessage('No comments found', 'info');
         }
       } catch (error) {
-        console.log('Error loading local backup:', error);
+        console.log('Error loading local comments:', error);
         displayComments([]);
       }
     }
@@ -185,45 +180,31 @@
       document.getElementById("comment-count").textContent = commentsArray.length;
     }
 
-    // Save comment to shared API
+    // Save comment to Firebase (shared database)
     async function saveCommentToAPI(commentData) {
       try {
-        // First get existing comments
-        const getResponse = await fetch(API_URL, {
-          method: 'GET',
-          headers: {
-            'X-Master-Key': API_KEY
-          }
-        });
+        // Add unique ID for Firebase
+        const commentId = 'comment_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        const commentUrl = `https://awesome-portfolio-comments-default-rtdb.firebaseio.com/comments/${commentId}.json`;
         
-        let existingComments = [];
-        if (getResponse.ok) {
-          const data = await getResponse.json();
-          existingComments = data.record.comments || [];
-        }
-        
-        // Add new comment
-        existingComments.push(commentData);
-        
-        // Update the database
-        const putResponse = await fetch(API_URL, {
+        const response = await fetch(commentUrl, {
           method: 'PUT',
           headers: {
-            'Content-Type': 'application/json',
-            'X-Master-Key': API_KEY
+            'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ comments: existingComments })
+          body: JSON.stringify(commentData)
         });
         
-        if (putResponse.ok) {
-          showMessage('Comment posted successfully!', 'success');
+        if (response.ok) {
+          showMessage('✅ Comment posted and shared with everyone!', 'success');
+          console.log('✅ Comment saved to shared database - visible to all users!');
           return true;
         } else {
-          throw new Error('Failed to save to server');
+          throw new Error('Failed to save to shared database');
         }
       } catch (error) {
-        console.error('Error saving to API:', error);
-        showMessage('Error posting comment - saved locally as backup', 'error');
+        console.error('Error saving to shared API:', error);
+        showMessage('⚠️ Sharing failed - saved locally as backup', 'error');
         // Save locally as backup
         saveCommentLocally(commentData);
         return false;
@@ -236,6 +217,8 @@
         const existingComments = JSON.parse(localStorage.getItem(COMMENTS_KEY) || "[]");
         existingComments.push(commentData);
         localStorage.setItem(COMMENTS_KEY, JSON.stringify(existingComments));
+        displayComments(existingComments);
+        console.log('💾 Comment saved locally as backup');
       } catch (error) {
         console.error('Error saving locally:', error);
       }
@@ -257,11 +240,13 @@
         timestamp: Date.now()
       };
       
-      // Save comment to shared API
+      // Save comment to shared Firebase database
       const saved = await saveCommentToAPI(commentData);
       
-      // Reload comments to show the new one (whether from API or local backup)
-      await loadComments();
+      // Reload comments to show the new one (from shared database or local backup)
+      setTimeout(async () => {
+        await loadComments();
+      }, saved ? 1000 : 0); // Give Firebase a moment to sync if successful
       
       // Reset form
       userComment.value = "";
@@ -277,8 +262,13 @@
       loadComments();
     });
     
-    // Refresh comments every 30 seconds to see new comments from other users
-    setInterval(loadComments, 30000);
+    // Refresh comments every 15 seconds to see new comments from other users
+    setInterval(loadComments, 15000);
+    
+    // Show initial status message
+    setTimeout(() => {
+      showMessage('🌐 Comments are now SHARED - everyone can see and add comments!', 'success');
+    }, 2000);
   </script>
 </body>
 </html>

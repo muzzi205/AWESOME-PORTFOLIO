@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Shared Comments</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: white;
+      min-height: 100vh;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+    }
+    button {
+      background: #28a745;
+      color: white;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: #6c757d;
+      cursor: not-allowed;
+    }
+    .comment {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 10px;
+      border-left: 4px solid #28a745;
+    }
+    .status {
+      padding: 10px;
+      border-radius: 5px;
+      margin: 10px 0;
+    }
+    .success { background-color: rgba(40, 167, 69, 0.3); }
+    .info { background-color: rgba(0, 123, 255, 0.3); }
+    .error { background-color: rgba(220, 53, 69, 0.3); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌐 Test Shared Comments System</h1>
+    <div class="status info" id="status">Initializing shared comment system...</div>
+    
+    <div>
+      <h3>Add a Test Comment:</h3>
+      <input type="text" id="name" placeholder="Your name" value="Test User">
+      <input type="text" id="message" placeholder="Your comment">
+      <button onclick="addTestComment()" id="addBtn">Add Comment</button>
+    </div>
+    
+    <div>
+      <h3>Shared Comments:</h3>
+      <div id="comments">Loading...</div>
+    </div>
+    
+    <div>
+      <button onclick="refreshComments()">🔄 Refresh Comments</button>
+      <button onclick="clearLocalBackup()">🗑️ Clear Local Backup</button>
+    </div>
+  </div>
+
+  <script src="shared_comments.js"></script>
+  <script>
+    let commentSystem;
+    
+    async function initSystem() {
+      try {
+        commentSystem = new SharedCommentSystem();
+        await commentSystem.init();
+        updateStatus('✅ Shared comment system ready! Comments are synced across all users.', 'success');
+        displayComments();
+      } catch (error) {
+        updateStatus('❌ Error initializing: ' + error.message, 'error');
+      }
+    }
+    
+    function updateStatus(message, type = 'info') {
+      const status = document.getElementById('status');
+      status.textContent = message;
+      status.className = 'status ' + type;
+    }
+    
+    async function addTestComment() {
+      const name = document.getElementById('name').value || 'Anonymous';
+      const message = document.getElementById('message').value;
+      
+      if (!message.trim()) {
+        updateStatus('Please enter a comment', 'error');
+        return;
+      }
+      
+      const btn = document.getElementById('addBtn');
+      btn.disabled = true;
+      btn.textContent = 'Adding...';
+      
+      const commentData = {
+        name: name,
+        message: message,
+        avatar: './img1/user.png'
+      };
+      
+      const success = await commentSystem.saveComment(commentData);
+      
+      if (success) {
+        updateStatus('✅ Comment added and shared with everyone!', 'success');
+        document.getElementById('message').value = '';
+        setTimeout(displayComments, 1000); // Give Firebase a moment to sync
+      } else {
+        updateStatus('⚠️ Comment saved locally as backup (sharing temporarily unavailable)', 'error');
+        displayComments();
+      }
+      
+      btn.disabled = false;
+      btn.textContent = 'Add Comment';
+    }
+    
+    async function refreshComments() {
+      updateStatus('🔄 Refreshing comments...', 'info');
+      await commentSystem.loadComments();
+      displayComments();
+      updateStatus('✅ Comments refreshed!', 'success');
+    }
+    
+    function displayComments() {
+      const commentsDiv = document.getElementById('comments');
+      const comments = commentSystem.getComments();
+      
+      if (comments.length === 0) {
+        commentsDiv.innerHTML = '<p>No comments yet. Be the first to comment!</p>';
+        return;
+      }
+      
+      commentsDiv.innerHTML = comments.map(comment => `
+        <div class="comment">
+          <strong>${comment.name}</strong><br>
+          <p>${comment.message}</p>
+          <small style="color: #aaa;">${comment.date}</small>
+        </div>
+      `).join('');
+    }
+    
+    function clearLocalBackup() {
+      if (confirm('Clear local backup? (Shared comments will remain)')) {
+        localStorage.removeItem('portfolio-comments-backup');
+        updateStatus('Local backup cleared', 'info');
+      }
+    }
+    
+    // Initialize on page load
+    window.addEventListener('DOMContentLoaded', initSystem);
+    
+    // Auto-refresh every 20 seconds to show new comments from other users
+    setInterval(async () => {
+      await commentSystem.loadComments();
+      displayComments();
+    }, 20000);
+  </script>
+</body>
+</html>
