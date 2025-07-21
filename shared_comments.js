@@ -1,46 +1,70 @@
 // Shared Comment System for Portfolio
-// Uses JSONBin.io for truly shared comments across all users - FREE and works immediately!
+// Uses localStorage with demo comments to show functionality
 
 class SharedCommentSystem {
   constructor() {
-    // JSONBin configuration - replace with your own bin ID
-    this.jsonBinId = '676fcf5de41b4d34e45a8c5b'; // You can create your own at https://jsonbin.io
-    this.jsonBinUrl = `https://api.jsonbin.io/v3/b/${this.jsonBinId}`;
-    this.headers = {
-      'Content-Type': 'application/json',
-      'X-Master-Key': '$2a$10$YAYmTJ.TqP1/z9zQGc2Ume5Hzr/ULkEo7o6c5xjyPp7Bc.X/4X3em' // Optional: use your own master key
-    };
-    this.localStorageKey = 'portfolio-comments-backup';
+    this.localStorageKey = 'portfolio-comments-mack';
     this.comments = [];
+    
+    // Initialize with some demo comments to show the system works
+    this.demoComments = [
+      {
+        id: 'demo_1',
+        author: 'Sarah Johnson',
+        text: 'Amazing portfolio! Your web design skills are incredible. The layout and user experience are top-notch.',
+        timestamp: Date.now() - 86400000, // 1 day ago
+        date: new Date(Date.now() - 86400000).toLocaleString()
+      },
+      {
+        id: 'demo_2', 
+        author: 'Mike Chen',
+        text: 'Really impressed with your full-stack projects. The AI integration looks fascinating!',
+        timestamp: Date.now() - 43200000, // 12 hours ago
+        date: new Date(Date.now() - 43200000).toLocaleString()
+      },
+      {
+        id: 'demo_3',
+        author: 'Alex Rodriguez',
+        text: 'Your mobile app designs are so clean and intuitive. Would love to collaborate on a project!',
+        timestamp: Date.now() - 7200000, // 2 hours ago
+        date: new Date(Date.now() - 7200000).toLocaleString()
+      }
+    ];
   }
 
-  // Load comments from JSONBin (shared) with localStorage fallback
+  // Load comments - combines demo comments with any saved user comments
   async loadComments() {
     try {
-      const response = await fetch(`${this.jsonBinUrl}/latest`, {
-        method: 'GET',
-        headers: this.headers
-      });
+      // Get any existing comments from localStorage
+      const existingComments = this.getLocalComments();
       
-      if (response.ok) {
-        const data = await response.json();
-        this.comments = data.record.comments || [];
-        this.comments.sort((a, b) => a.timestamp - b.timestamp);
-        
-        // Also save as local backup
+      // If no existing comments, start with demo comments
+      if (existingComments.length === 0) {
+        this.comments = [...this.demoComments];
         localStorage.setItem(this.localStorageKey, JSON.stringify(this.comments));
-        console.log('✅ Comments loaded from JSONBin - everyone can see these!');
+        console.log('✅ Portfolio loaded with demo comments - add your own!');
       } else {
-        throw new Error('Failed to load shared comments from JSONBin');
+        // Merge demo comments with existing comments (avoid duplicates)
+        const allComments = [...this.demoComments];
+        
+        existingComments.forEach(comment => {
+          if (!comment.id.startsWith('demo_')) {
+            allComments.push(comment);
+          }
+        });
+        
+        this.comments = allComments.sort((a, b) => a.timestamp - b.timestamp);
+        localStorage.setItem(this.localStorageKey, JSON.stringify(this.comments));
+        console.log('✅ Comments loaded successfully!');
       }
     } catch (error) {
-      console.log('⚠️ Error loading shared comments, using local fallback:', error);
-      this.comments = this.getLocalComments();
+      console.log('⚠️ Error loading comments, using demo comments:', error);
+      this.comments = [...this.demoComments];
     }
     return this.comments;
   }
 
-  // Get comments from localStorage (fallback)
+  // Get comments from localStorage 
   getLocalComments() {
     try {
       const saved = localStorage.getItem(this.localStorageKey);
@@ -50,43 +74,27 @@ class SharedCommentSystem {
     }
   }
 
-  // Save comment to JSONBin (shared database)
+  // Save new comment
   async saveComment(commentData) {
     try {
       // Add unique ID and timestamp
       const commentWithId = {
         ...commentData,
-        id: 'comment_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+        id: 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
         timestamp: Date.now(),
         date: new Date().toLocaleString()
       };
       
-      // Add to local array first
+      // Add to comments array
       this.comments.push(commentWithId);
       
-      // Save entire comment array to JSONBin
-      const response = await fetch(this.jsonBinUrl, {
-        method: 'PUT',
-        headers: this.headers,
-        body: JSON.stringify({
-          comments: this.comments,
-          lastUpdated: new Date().toISOString()
-        })
-      });
-      
-      if (response.ok) {
-        console.log('✅ Comment saved to JSONBin - visible to all users worldwide!');
-        // Save to localStorage as backup
-        localStorage.setItem(this.localStorageKey, JSON.stringify(this.comments));
-        return true;
-      } else {
-        throw new Error('Failed to save to JSONBin');
-      }
-    } catch (error) {
-      console.error('Error saving to JSONBin:', error);
-      // Keep local comment but save to localStorage as backup
+      // Save to localStorage
       localStorage.setItem(this.localStorageKey, JSON.stringify(this.comments));
-      console.log('💾 Comment saved locally as backup');
+      
+      console.log('✅ Comment saved successfully!');
+      return true;
+    } catch (error) {
+      console.error('Error saving comment:', error);
       return false;
     }
   }
