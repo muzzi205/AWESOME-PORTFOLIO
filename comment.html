@@ -66,8 +66,10 @@
   <script>
     let selectedAvatar = "./img1/user.png";
     
-    // Use localStorage for now - will implement shared system later
-    const COMMENTS_KEY = 'portfolio-comments-v2';
+    // Shared comments using JSONBin.io public API
+    const API_URL = 'https://api.jsonbin.io/v3/b/679675b5ad19ca34f8d82b7b';
+    const API_KEY = '$2a$10$QyJ3v9Kh.0fYPH7XpQy2S.YN6xXw8LzVk7dM4nB2rQ3pT8hG5cF1y';
+    const COMMENTS_KEY = 'portfolio-comments-local-backup';
   
     // Avatar selection logic
     document.querySelectorAll(".avatar-option").forEach((img) => {
@@ -114,20 +116,49 @@
       }, 3000);
     }
 
-    // Load comments from localStorage
-    function loadComments() {
+    // Load comments from shared API
+    async function loadComments() {
+      try {
+        showMessage('Loading comments...', 'info');
+        
+        const response = await fetch(API_URL, {
+          method: 'GET',
+          headers: {
+            'X-Master-Key': API_KEY
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          const commentsArray = data.record.comments || [];
+          displayComments(commentsArray);
+          
+          // Also save locally as backup
+          localStorage.setItem(COMMENTS_KEY, JSON.stringify(commentsArray));
+          console.log('Comments loaded from shared database');
+        } else {
+          throw new Error('Failed to load from server');
+        }
+      } catch (error) {
+        console.log('Error loading shared comments, using local backup:', error);
+        loadLocalBackup();
+      }
+    }
+    
+    // Fallback to local backup
+    function loadLocalBackup() {
       try {
         const savedComments = localStorage.getItem(COMMENTS_KEY);
         if (savedComments) {
           const commentsData = JSON.parse(savedComments);
           displayComments(commentsData);
-          console.log('Comments loaded from localStorage');
+          showMessage('Loaded comments from local backup', 'info');
         } else {
           displayComments([]);
-          console.log('No saved comments found');
+          showMessage('No comments found', 'info');
         }
       } catch (error) {
-        console.log('Error loading comments:', error);
+        console.log('Error loading local backup:', error);
         displayComments([]);
       }
     }
@@ -154,22 +185,63 @@
       document.getElementById("comment-count").textContent = commentsArray.length;
     }
 
-    // Save comment locally
-    function saveComment(commentData) {
+    // Save comment to shared API
+    async function saveCommentToAPI(commentData) {
+      try {
+        // First get existing comments
+        const getResponse = await fetch(API_URL, {
+          method: 'GET',
+          headers: {
+            'X-Master-Key': API_KEY
+          }
+        });
+        
+        let existingComments = [];
+        if (getResponse.ok) {
+          const data = await getResponse.json();
+          existingComments = data.record.comments || [];
+        }
+        
+        // Add new comment
+        existingComments.push(commentData);
+        
+        // Update the database
+        const putResponse = await fetch(API_URL, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Master-Key': API_KEY
+          },
+          body: JSON.stringify({ comments: existingComments })
+        });
+        
+        if (putResponse.ok) {
+          showMessage('Comment posted successfully!', 'success');
+          return true;
+        } else {
+          throw new Error('Failed to save to server');
+        }
+      } catch (error) {
+        console.error('Error saving to API:', error);
+        showMessage('Error posting comment - saved locally as backup', 'error');
+        // Save locally as backup
+        saveCommentLocally(commentData);
+        return false;
+      }
+    }
+    
+    // Save comment locally as backup
+    function saveCommentLocally(commentData) {
       try {
         const existingComments = JSON.parse(localStorage.getItem(COMMENTS_KEY) || "[]");
         existingComments.push(commentData);
         localStorage.setItem(COMMENTS_KEY, JSON.stringify(existingComments));
-        showMessage('Comment posted successfully!', 'success');
-        return true;
       } catch (error) {
-        console.error('Error saving comment:', error);
-        showMessage('Error posting comment', 'error');
-        return false;
+        console.error('Error saving locally:', error);
       }
     }
   
-    function addComment() {
+    async function addComment() {
       const name = anonymousInput.value;
       const message = userComment.value;
       const date = new Date().toLocaleString();
@@ -185,18 +257,15 @@
         timestamp: Date.now()
       };
       
-      // Save comment
-      const saved = saveComment(commentData);
+      // Save comment to shared API
+      const saved = await saveCommentToAPI(commentData);
       
-      if (saved) {
-        // Reload comments to show the new one
-        loadComments();
-        
-        // Reset form
-        userComment.value = "";
-        anonymousInput.value = "Anonymous";
-      }
+      // Reload comments to show the new one (whether from API or local backup)
+      await loadComments();
       
+      // Reset form
+      userComment.value = "";
+      anonymousInput.value = "Anonymous";
       publishBtn.disabled = true;
       publishBtn.textContent = 'Publish';
     }
