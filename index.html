@@ -944,54 +944,31 @@ displayComments(commentsData);
       document.getElementById("comment-count").textContent = commentsData.length;
     }
     
-// Save comment to shared database
-async function saveComment(commentData) {
-try {
-showMessage("Saving comment...", "info");
-
-// First get existing comments
-const response = await fetch(API_URL + "/latest", {
-method: "GET",
-headers: {
-"X-Access-Key": API_KEY
-}
-});
-
-let existingComments = [];
-if (response.ok) {
-const data = await response.json();
-existingComments = data.record.comments || [];
-}
-
-// Add new comment
-existingComments.push(commentData);
-
-// Save updated comments back to database
-const saveResponse = await fetch(API_URL, {
-method: "PUT",
-headers: {
-"Content-Type": "application/json",
-"X-Access-Key": API_KEY
-},
-body: JSON.stringify({ comments: existingComments })
-});
-
-if (saveResponse.ok) {
-displayComments(existingComments);
-showMessage("Comment added successfully! 🎉 Everyone can see it now!", "success");
-console.log("Comment saved to shared database");
-} else {
-throw new Error("Failed to save to shared database");
-}
-} catch (error) {
-console.log("Error saving to shared database:", error);
-// Fallback to local storage
-const localComments = JSON.parse(localStorage.getItem("portfolio-comments") || "[]");
-localComments.push(commentData);
-localStorage.setItem("portfolio-comments", JSON.stringify(localComments));
-displayComments(localComments);
-showMessage("Comment saved locally (offline mode)", "success");
-}      }
+    function saveComment(commentData) {
+      try {
+        // Get existing comments
+        const existingComments = JSON.parse(localStorage.getItem("portfolio-comments") || '[]');
+        
+        // Add new comment
+        existingComments.push(commentData);
+        
+        // Save to localStorage
+        localStorage.setItem("portfolio-comments", JSON.stringify(existingComments));
+        
+        // Also save to sessionStorage for cross-tab sharing
+        sessionStorage.setItem("portfolio-comments", JSON.stringify(existingComments));
+        
+        // Display updated comments
+        displayComments(existingComments);
+        
+        console.log('Comment saved successfully!');
+        
+        // Show success message
+        showMessage('Comment added successfully! 🎉', 'success');
+      } catch (error) {
+        console.log('Error saving comment:', error);
+        showMessage('Error saving comment. Please try again.', 'error');
+      }
     }
     
     function showMessage(text, type) {
@@ -1048,18 +1025,7 @@ showMessage("Comment saved locally (offline mode)", "success");
         message: message,
         date: date,
         avatar: selectedAvatar,
-
-// Auto-refresh comments every 30 seconds to show new comments from other users
-setInterval(() => {
-loadComments();
-}, 30000);
-
-// Listen for storage changes (when someone comments in another tab)
-window.addEventListener("storage", (e) => {
-if (e.key === "portfolio-comments") {
-loadComments();
-}
-});        id: Date.now() + Math.random() // Unique ID
+        id: Date.now() + Math.random() // Unique ID
       };
       
       // Save comment
