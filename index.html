@@ -944,30 +944,74 @@ displayComments(commentsData);
       document.getElementById("comment-count").textContent = commentsData.length;
     }
     
-    function saveComment(commentData) {
+    // Save comment to shared JSONBin database
+    async function saveComment(commentData) {
       try {
-        // Get existing comments
-        const existingComments = JSON.parse(localStorage.getItem("portfolio-comments") || '[]');
+        // Show saving message
+        showMessage('Saving comment...', 'success');
+        
+        // First, get existing comments from JSONBin
+        let existingComments = [];
+        try {
+          const getResponse = await fetch(API_URL + "/latest", {
+            method: "GET",
+            headers: {
+              "X-Access-Key": API_KEY
+            }
+          });
+          
+          if (getResponse.ok) {
+            const data = await getResponse.json();
+            existingComments = data.record.comments || [];
+          }
+        } catch (error) {
+          console.log('Error getting existing comments:', error);
+          // Try to get from localStorage as fallback
+          existingComments = JSON.parse(localStorage.getItem("portfolio-comments") || '[]');
+        }
         
         // Add new comment
         existingComments.push(commentData);
         
-        // Save to localStorage
-        localStorage.setItem("portfolio-comments", JSON.stringify(existingComments));
+        // Save to JSONBin
+        const saveResponse = await fetch(API_URL, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Access-Key": API_KEY
+          },
+          body: JSON.stringify({
+            comments: existingComments
+          })
+        });
         
-        // Also save to sessionStorage for cross-tab sharing
-        sessionStorage.setItem("portfolio-comments", JSON.stringify(existingComments));
+        if (saveResponse.ok) {
+          // Also save to localStorage as backup
+          localStorage.setItem("portfolio-comments", JSON.stringify(existingComments));
+          
+          // Display updated comments
+          displayComments(existingComments);
+          
+          console.log('Comment saved to shared database successfully!');
+          showMessage('Comment shared with everyone! 🎉', 'success');
+        } else {
+          throw new Error('Failed to save to shared database');
+        }
         
-        // Display updated comments
-        displayComments(existingComments);
-        
-        console.log('Comment saved successfully!');
-        
-        // Show success message
-        showMessage('Comment added successfully! 🎉', 'success');
       } catch (error) {
-        console.log('Error saving comment:', error);
-        showMessage('Error saving comment. Please try again.', 'error');
+        console.log('Error saving comment to shared database:', error);
+        
+        // Fallback to localStorage only
+        try {
+          const existingComments = JSON.parse(localStorage.getItem("portfolio-comments") || '[]');
+          existingComments.push(commentData);
+          localStorage.setItem("portfolio-comments", JSON.stringify(existingComments));
+          displayComments(existingComments);
+          showMessage('Comment saved locally (shared database unavailable)', 'error');
+        } catch (localError) {
+          console.log('Error saving comment locally:', localError);
+          showMessage('Error saving comment. Please try again.', 'error');
+        }
       }
     }
     
@@ -1049,6 +1093,11 @@ displayComments(commentsData);
     // Load comments when page loads
     window.addEventListener("DOMContentLoaded", () => {
       loadComments();
+      
+      // Set up automatic refresh for real-time comments
+      setInterval(() => {
+        loadComments();
+      }, 30000); // Refresh every 30 seconds
     });
     
     // Listen for storage changes (comments from other tabs)
@@ -1056,6 +1105,11 @@ displayComments(commentsData);
       if (e.key === 'portfolio-comments') {
         loadComments();
       }
+    });
+    
+    // Also refresh when user focuses on the tab (in case they switched tabs)
+    window.addEventListener('focus', () => {
+      loadComments();
     });
   </script>
 
