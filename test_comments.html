@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comments System Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0f001a;
+            color: white;
+            padding: 20px;
+        }
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success {
+            background: #4caf50;
+        }
+        .error {
+            background: #f44336;
+        }
+        .warning {
+            background: #ff9800;
+        }
+        .info {
+            background: #2196f3;
+        }
+        button {
+            background: #f9004d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #d4002a;
+        }
+        .comment-form {
+            margin: 20px 0;
+        }
+        .comment-form input, .comment-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        .comments-display {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+        .comment {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 3px solid #00ffae;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Comments System Test</h1>
+        
+        <div id="status-display"></div>
+
+        <div class="comment-form">
+            <h3>Test Comment Form</h3>
+            <input type="text" id="test-name" placeholder="Your Name" value="Test User">
+            <textarea id="test-message" placeholder="Your comment" rows="4">This is a test comment to verify the system works!</textarea>
+            <button onclick="testAddComment()">🚀 Test Add Comment</button>
+            <button onclick="testLoadComments()">📥 Test Load Comments</button>
+            <button onclick="clearLocalComments()">🗑️ Clear Local Storage</button>
+        </div>
+
+        <div class="comments-display">
+            <h3>Comments (<span id="comment-count">0</span>)</h3>
+            <div id="comments-container"></div>
+        </div>
+    </div>
+
+    <script>
+        // Same API configuration as your main site
+        const API_URL = "https://api.jsonbin.io/v3/b/68820c86ae596e708fbaf814";
+        const API_KEY = "$2a$10$HUBnO70f4gVFP84mx/XFxuYxTZARXnUl0STP8MMeL0FlattKc2nNK";
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status-display');
+            const statusElement = document.createElement('div');
+            statusElement.className = `status ${type}`;
+            statusElement.textContent = message;
+            statusDiv.appendChild(statusElement);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                statusElement.remove();
+            }, 5000);
+        }
+
+        async function testLoadComments() {
+            showStatus('🔄 Testing comment loading...', 'info');
+            
+            try {
+                const response = await fetch(API_URL + "/latest", {
+                    method: "GET",
+                    headers: {
+                        "X-Access-Key": API_KEY
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const comments = data.record.comments || [];
+                    displayComments(comments);
+                    showStatus(`✅ Successfully loaded ${comments.length} comments from server!`, 'success');
+                } else {
+                    throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                showStatus(`⚠️ Server load failed: ${error.message}. Using local storage.`, 'warning');
+                loadLocalComments();
+            }
+        }
+
+        function loadLocalComments() {
+            const savedComments = localStorage.getItem("portfolio-comments");
+            const comments = savedComments ? JSON.parse(savedComments) : [];
+            displayComments(comments);
+            showStatus(`📱 Loaded ${comments.length} comments from local storage`, 'info');
+        }
+
+        function displayComments(comments) {
+            const container = document.getElementById('comments-container');
+            const countElement = document.getElementById('comment-count');
+            
+            container.innerHTML = '';
+            countElement.textContent = comments.length;
+
+            if (comments.length === 0) {
+                container.innerHTML = '<p style="color: #aaa;">No comments yet. Be the first to comment!</p>';
+            } else {
+                comments.forEach(comment => {
+                    const commentDiv = document.createElement('div');
+                    commentDiv.className = 'comment';
+                    commentDiv.innerHTML = `
+                        <strong style="color: #00ffae;">${comment.name}</strong>
+                        <p style="margin: 8px 0;">${comment.message}</p>
+                        <small style="color: #aaa;">${comment.date}</small>
+                    `;
+                    container.appendChild(commentDiv);
+                });
+            }
+        }
+
+        async function testAddComment() {
+            const name = document.getElementById('test-name').value.trim() || 'Anonymous';
+            const message = document.getElementById('test-message').value.trim();
+
+            if (!message) {
+                showStatus('❌ Please enter a comment message!', 'error');
+                return;
+            }
+
+            const commentData = {
+                name: name,
+                message: message,
+                date: new Date().toLocaleString(),
+                avatar: "./img1/user.png",
+                id: Date.now() + Math.random()
+            };
+
+            showStatus('🔄 Testing comment submission...', 'info');
+
+            try {
+                // Try to get existing comments first
+                let existingComments = [];
+                try {
+                    const getResponse = await fetch(API_URL + "/latest", {
+                        method: "GET",
+                        headers: {
+                            "X-Access-Key": API_KEY
+                        }
+                    });
+                    
+                    if (getResponse.ok) {
+                        const data = await getResponse.json();
+                        existingComments = data.record.comments || [];
+                    }
+                } catch (getError) {
+                    // Use local storage as fallback
+                    existingComments = JSON.parse(localStorage.getItem("portfolio-comments") || '[]');
+                }
+
+                // Add new comment
+                existingComments.push(commentData);
+
+                // Try to save to server
+                const saveResponse = await fetch(API_URL, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Access-Key": API_KEY
+                    },
+                    body: JSON.stringify({
+                        comments: existingComments
+                    })
+                });
+
+                if (saveResponse.ok) {
+                    localStorage.setItem("portfolio-comments", JSON.stringify(existingComments));
+                    displayComments(existingComments);
+                    showStatus('🎉 Comment saved to server successfully!', 'success');
+                    
+                    // Clear form
+                    document.getElementById('test-message').value = '';
+                } else {
+                    throw new Error(`Save failed: ${saveResponse.status}`);
+                }
+
+            } catch (error) {
+                // Fallback to local storage
+                showStatus(`⚠️ Server save failed: ${error.message}. Saving locally.`, 'warning');
+                
+                const localComments = JSON.parse(localStorage.getItem("portfolio-comments") || '[]');
+                localComments.push(commentData);
+                localStorage.setItem("portfolio-comments", JSON.stringify(localComments));
+                displayComments(localComments);
+                
+                // Clear form
+                document.getElementById('test-message').value = '';
+            }
+        }
+
+        function clearLocalComments() {
+            localStorage.removeItem("portfolio-comments");
+            displayComments([]);
+            showStatus('🗑️ Local storage cleared', 'info');
+        }
+
+        // Load comments on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            testLoadComments();
+        });
+    </script>
+</body>
+</html>
