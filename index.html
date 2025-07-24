@@ -891,34 +891,39 @@ footer a:hover {
       publishBtn.disabled = e.currentTarget.value === "";
     });
 
-// Shared Comments Database using JSON storage service - FIXED
-const API_URL = "https://api.jsonbin.io/v3/b/679541e5ad19ca34f8d9e8e8";
-const API_KEY = "$2a$10$8vKzVqPWkfOEX4i6Jz6QQeuYXi9rU7tGxJpKmPnfY8rOqvKjJhLKm";
+// Simple Global Comments System using JSONBin with proper configuration
+const GLOBAL_COMMENTS_API = "https://api.jsonbin.io/v3/b/679a8b12e41b4d34e45b5f23";
+const MASTER_KEY = "$2a$10$hGZtFYLpKFJwM8V3xN6Q3uPvE2W0RLtG9JhKsNqMoPlFyDcVbX8eK";
 
-// Load comments from shared database
-async function loadComments() {
-try {
-const response = await fetch(API_URL + "/latest", {
-method: "GET",
-headers: {
-"X-Access-Key": API_KEY
-}
-});
+// Load comments from global database (accessible by everyone)
+async function loadGlobalComments() {
+  try {
+    console.log('Loading global comments...');
+    const response = await fetch(GLOBAL_COMMENTS_API + "/latest", {
+      method: "GET",
+      headers: {
+        "X-Master-Key": MASTER_KEY,
+        "X-Access-Key": MASTER_KEY
+      }
+    });
 
-if (response.ok) {
-const data = await response.json();
-const commentsData = data.record.comments || [];
-displayComments(commentsData);
-console.log("Comments loaded from shared database");
-} else {
-loadLocalComments();
+    if (response.ok) {
+      const data = await response.json();
+      const commentsData = data.record?.comments || [];
+      displayComments(commentsData);
+      console.log(`Loaded ${commentsData.length} global comments`);
+      return true;
+    } else {
+      console.log('Global API failed, using localStorage');
+      loadLocalComments();
+      return false;
+    }
+  } catch (error) {
+    console.log('Error loading global comments:', error);
+    loadLocalComments();
+    return false;
+  }
 }
-} catch (error) {
-console.log("Error loading shared comments:", error);
-loadLocalComments();
-}
-}
-
 // Fallback to local storage
 function loadLocalComments() {
 const savedComments = localStorage.getItem("portfolio-comments");
@@ -944,41 +949,39 @@ displayComments(commentsData);
       document.getElementById("comment-count").textContent = commentsData.length;
     }
     
-    // Save comment to shared JSONBin database
+    // Save comment to global database
     async function saveComment(commentData) {
       try {
-        // Show saving message
         showMessage('Saving comment...', 'success');
         
-        // First, get existing comments from JSONBin
+        // Get existing comments from global database
         let existingComments = [];
         try {
-          const getResponse = await fetch(API_URL + "/latest", {
+          const getResponse = await fetch(GLOBAL_COMMENTS_API + "/latest", {
             method: "GET",
             headers: {
-              "X-Access-Key": API_KEY
+              "X-Master-Key": MASTER_KEY
             }
           });
           
           if (getResponse.ok) {
             const data = await getResponse.json();
-            existingComments = data.record.comments || [];
+            existingComments = data.record?.comments || [];
           }
         } catch (error) {
           console.log('Error getting existing comments:', error);
-          // Try to get from localStorage as fallback
           existingComments = JSON.parse(localStorage.getItem("portfolio-comments") || '[]');
         }
         
         // Add new comment
         existingComments.push(commentData);
         
-        // Save to JSONBin
-        const saveResponse = await fetch(API_URL, {
+        // Save to global database
+        const saveResponse = await fetch(GLOBAL_COMMENTS_API, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            "X-Access-Key": API_KEY
+            "X-Master-Key": MASTER_KEY
           },
           body: JSON.stringify({
             comments: existingComments
@@ -986,20 +989,20 @@ displayComments(commentsData);
         });
         
         if (saveResponse.ok) {
-          // Also save to localStorage as backup
+          // Also save locally as backup
           localStorage.setItem("portfolio-comments", JSON.stringify(existingComments));
           
           // Display updated comments
           displayComments(existingComments);
           
-          console.log('Comment saved to shared database successfully!');
-          showMessage('Comment shared with everyone! 🎉', 'success');
+          console.log('Comment saved to global database!');
+          showMessage('Comment shared globally! 🎉', 'success');
         } else {
-          throw new Error('Failed to save to shared database');
+          throw new Error('Failed to save to global database');
         }
         
       } catch (error) {
-        console.log('Error saving comment to shared database:', error);
+        console.log('Error saving to global database:', error);
         
         // Fallback to localStorage only
         try {
@@ -1007,7 +1010,7 @@ displayComments(commentsData);
           existingComments.push(commentData);
           localStorage.setItem("portfolio-comments", JSON.stringify(existingComments));
           displayComments(existingComments);
-          showMessage('Comment saved locally (shared database unavailable)', 'error');
+          showMessage('Comment saved locally (global sync failed)', 'error');
         } catch (localError) {
           console.log('Error saving comment locally:', localError);
           showMessage('Error saving comment. Please try again.', 'error');
@@ -1092,24 +1095,24 @@ displayComments(commentsData);
   
     // Load comments when page loads
     window.addEventListener("DOMContentLoaded", () => {
-      loadComments();
+loadGlobalComments();
       
       // Set up automatic refresh for real-time comments
       setInterval(() => {
-        loadComments();
+        loadGlobalComments();
       }, 30000); // Refresh every 30 seconds
     });
     
     // Listen for storage changes (comments from other tabs)
     window.addEventListener('storage', (e) => {
       if (e.key === 'portfolio-comments') {
-        loadComments();
+        loadGlobalComments();
       }
     });
     
     // Also refresh when user focuses on the tab (in case they switched tabs)
     window.addEventListener('focus', () => {
-      loadComments();
+      loadGlobalComments();
     });
   </script>
 
