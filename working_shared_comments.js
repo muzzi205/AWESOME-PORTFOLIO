@@ -1,13 +1,10 @@
-// Real-time Comment System for Portfolio
-// Allows everyone to see each other's comments in real-time
+// Working Shared Comment System for Portfolio
+// Uses Firebase Realtime Database for true global sharing
 
-class SharedCommentSystem {
+class WorkingSharedCommentSystem {
   constructor() {
-    // Using JSONBin.io for shared comment storage
-    this.API_BASE = 'https://api.jsonbin.io/v3/b';
-    this.BIN_ID = '674f0f57e41b4d34e466ba1f'; // Real bin for your portfolio comments
-    this.API_KEY = '$2a$10$k1XQ8l2z9YoP5.I7FdBLxeLmV4Qv6ZR3pT8Nd0MCFGjU4HqWKoE9.'; // Access key
-    this.API_URL = `${this.API_BASE}/${this.BIN_ID}`; // Complete API URL
+    // Firebase Realtime Database configuration (free tier)
+    this.FIREBASE_URL = 'https://portfolio-comments-default-rtdb.firebaseio.com/comments.json';
     
     // Fallback storage
     this.localStorageKey = 'portfolio-comments-backup';
@@ -58,12 +55,38 @@ class SharedCommentSystem {
     });
   }
 
-  // Load comments from localStorage with demo comments
+  // Load comments from both local and global sources
   async loadComments() {
     try {
-      console.log('📱 Loading comments from local storage...');
+      if (this.isOnline) {
+        console.log('🌐 Loading comments from global database...');
+        
+        // Try to load from global database
+        try {
+          const response = await fetch(this.FIREBASE_URL);
+          if (response.ok) {
+            const globalData = await response.json();
+            if (globalData) {
+              // Convert Firebase object to array
+              const globalComments = Object.values(globalData);
+              
+              // Merge with demo comments if they're not already there
+              const existingIds = globalComments.map(c => c.id);
+              const newDemoComments = this.demoComments.filter(demo => !existingIds.includes(demo.id));
+              
+              this.comments = [...globalComments, ...newDemoComments];
+              this.saveLocalBackup();
+              console.log(`🌐 Loaded ${globalComments.length} global + ${newDemoComments.length} demo comments`);
+              return this.comments;
+            }
+          }
+        } catch (globalError) {
+          console.log('Global load failed, using local backup:', globalError.message);
+        }
+      }
       
-      // Try to load from local storage first
+      // Fallback to local storage
+      console.log('📱 Loading comments from local storage...');
       const localBackup = this.getLocalBackup();
       
       if (localBackup && localBackup.length > 0) {
@@ -77,7 +100,7 @@ class SharedCommentSystem {
         // First time - show demo comments
         this.comments = [...this.demoComments];
         console.log('🎭 First time loading - showing demo comments');
-        this.saveLocalBackup(); // Save demo comments to localStorage
+        this.saveLocalBackup();
       }
       
       console.log(`📊 Total comments loaded: ${this.comments.length}`);
@@ -91,20 +114,27 @@ class SharedCommentSystem {
     }
   }
 
-  // Save comments to global JSONBin database
-  async saveToGlobalDatabase(comments) {
+  // Save comments to Firebase Realtime Database
+  async saveToGlobalDatabase(comment) {
     try {
-      const response = await fetch(this.API_URL, {
+      if (!this.isOnline) {
+        throw new Error('No internet connection');
+      }
+
+      // Create a unique Firebase key for this comment
+      const firebaseKey = `comment_${comment.id}`;
+      const commentUrl = `https://portfolio-comments-default-rtdb.firebaseio.com/comments/${firebaseKey}.json`;
+      
+      const response = await fetch(commentUrl, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
-          'X-Master-Key': this.API_KEY
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(comments)
+        body: JSON.stringify(comment)
       });
       
       if (response.ok) {
-        console.log('✅ Comments saved to global database - visible worldwide!');
+        console.log('✅ Comment saved to global database - visible worldwide!');
         return true;
       } else {
         throw new Error(`Save failed with status: ${response.status}`);
@@ -135,8 +165,7 @@ class SharedCommentSystem {
     }
   }
 
-
-  // Save new comment to global database (JSONBin)
+  // Save new comment to global database
   async saveComment(commentData) {
     try {
       const commentWithId = {
@@ -147,11 +176,11 @@ class SharedCommentSystem {
         isGlobal: true // Mark as globally shared
       };
       
-      // Add to local array first
+      // Add to local array first for immediate display
       this.comments.push(commentWithId);
       
       // Try to save to global database
-      const globalSaveSuccess = await this.saveToGlobalDatabase(this.comments);
+      const globalSaveSuccess = await this.saveToGlobalDatabase(commentWithId);
       
       if (globalSaveSuccess) {
         console.log('🌐 Comment posted and visible to everyone worldwide!');
@@ -169,32 +198,57 @@ class SharedCommentSystem {
     }
   }
 
-  // Get all comments
+  // Get all comments sorted by timestamp
   getComments() {
-    return this.comments.sort((a, b) => b.timestamp - a.timestamp);
+    return this.comments.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
   }
 
   // Initialize the comment system
   async init() {
-    console.log('🚀 Initializing global comment system...');
+    console.log('🚀 Initializing working global comment system...');
     
     await this.loadComments();
+    this.isInitialized = true;
     
     // Set up periodic sync with global database
-    setInterval(async () => {
-      if (this.isOnline) {
-        try {
-          // Reload comments from global database to get latest from other users
-          await this.loadComments();
-        } catch (error) {
-          console.log('Sync check failed:', error.message);
+    if (this.isOnline) {
+      setInterval(async () => {
+        if (this.isOnline) {
+          try {
+            // Reload comments from global database to get latest from other users
+            await this.loadComments();
+          } catch (error) {
+            console.log('Auto-sync failed:', error.message);
+          }
         }
-      }
-    }, 30000); // Check for new comments every 30 seconds
+      }, 15000); // Check for new comments every 15 seconds
+    }
     
-    console.log('🌐 Shared comment system initialized - comments are now globally visible!');
-    console.log(`📊 Loaded ${this.comments.length} comments from global storage`);
+    console.log('🌐 Working shared comment system initialized - comments are now globally visible!');
+    console.log(`📊 Loaded ${this.comments.length} comments from storage`);
     
     return this;
   }
+
+  // Clear all global comments (for testing purposes)
+  async clearGlobalComments() {
+    try {
+      const response = await fetch('https://portfolio-comments-default-rtdb.firebaseio.com/comments.json', {
+        method: 'DELETE'
+      });
+      
+      if (response.ok) {
+        console.log('🗑️ All global comments cleared');
+        this.comments = [...this.demoComments];
+        this.saveLocalBackup();
+        return true;
+      }
+    } catch (error) {
+      console.error('Failed to clear global comments:', error);
+      return false;
+    }
+  }
 }
+
+// Make it globally available
+window.WorkingSharedCommentSystem = WorkingSharedCommentSystem;
