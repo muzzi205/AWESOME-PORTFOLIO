@@ -891,45 +891,38 @@ footer a:hover {
       publishBtn.disabled = e.currentTarget.value === "";
     });
 
-// Simple Global Comments System using JSONBin with proper configuration
-const GLOBAL_COMMENTS_API = "https://api.jsonbin.io/v3/b/679a8b12e41b4d34e45b5f23";
-const MASTER_KEY = "$2a$10$hGZtFYLpKFJwM8V3xN6Q3uPvE2W0RLtG9JhKsNqMoPlFyDcVbX8eK";
-
-// Load comments from global database (accessible by everyone)
-async function loadGlobalComments() {
-  try {
-    console.log('Loading global comments...');
-    const response = await fetch(GLOBAL_COMMENTS_API + "/latest", {
-      method: "GET",
-      headers: {
-        "X-Master-Key": MASTER_KEY,
-        "X-Access-Key": MASTER_KEY
+    // Use GitHub Gist as a simple database
+    const GIST_ID = '012345'; // We'll create this
+    const GITHUB_TOKEN = 'your_token'; // You'll need to create this
+    
+    // For now, let's use localStorage with session storage for better persistence
+    function loadComments() {
+      try {
+        // Try to load from localStorage first
+        const savedComments = localStorage.getItem("portfolio-comments");
+        if (savedComments) {
+          const commentsData = JSON.parse(savedComments);
+          displayComments(commentsData);
+        }
+        
+        // Also check sessionStorage for cross-tab sharing
+        const sessionComments = sessionStorage.getItem("portfolio-comments");
+        if (sessionComments) {
+          const sessionData = JSON.parse(sessionComments);
+          // Merge with localStorage
+          const localData = savedComments ? JSON.parse(savedComments) : [];
+          const mergedComments = [...localData, ...sessionData.filter(sc => 
+            !localData.find(lc => lc.id === sc.id)
+          )];
+          displayComments(mergedComments);
+          localStorage.setItem("portfolio-comments", JSON.stringify(mergedComments));
+        }
+      } catch (error) {
+        console.log('Error loading comments:', error);
+        displayComments([]);
       }
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      const commentsData = data.record?.comments || [];
-      displayComments(commentsData);
-      console.log(`Loaded ${commentsData.length} global comments`);
-      return true;
-    } else {
-      console.log('Global API failed, using localStorage');
-      loadLocalComments();
-      return false;
     }
-  } catch (error) {
-    console.log('Error loading global comments:', error);
-    loadLocalComments();
-    return false;
-  }
-}
-// Fallback to local storage
-function loadLocalComments() {
-const savedComments = localStorage.getItem("portfolio-comments");
-const commentsData = savedComments ? JSON.parse(savedComments) : [];
-displayComments(commentsData);
-}    
+    
     function displayComments(commentsData) {
       comments.innerHTML = '';
       commentsData.forEach(comment => {
@@ -949,72 +942,30 @@ displayComments(commentsData);
       document.getElementById("comment-count").textContent = commentsData.length;
     }
     
-    // Save comment to global database
-    async function saveComment(commentData) {
+    function saveComment(commentData) {
       try {
-        showMessage('Saving comment...', 'success');
-        
-        // Get existing comments from global database
-        let existingComments = [];
-        try {
-          const getResponse = await fetch(GLOBAL_COMMENTS_API + "/latest", {
-            method: "GET",
-            headers: {
-              "X-Master-Key": MASTER_KEY
-            }
-          });
-          
-          if (getResponse.ok) {
-            const data = await getResponse.json();
-            existingComments = data.record?.comments || [];
-          }
-        } catch (error) {
-          console.log('Error getting existing comments:', error);
-          existingComments = JSON.parse(localStorage.getItem("portfolio-comments") || '[]');
-        }
+        // Get existing comments
+        const existingComments = JSON.parse(localStorage.getItem("portfolio-comments") || '[]');
         
         // Add new comment
         existingComments.push(commentData);
         
-        // Save to global database
-        const saveResponse = await fetch(GLOBAL_COMMENTS_API, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Master-Key": MASTER_KEY
-          },
-          body: JSON.stringify({
-            comments: existingComments
-          })
-        });
+        // Save to localStorage
+        localStorage.setItem("portfolio-comments", JSON.stringify(existingComments));
         
-        if (saveResponse.ok) {
-          // Also save locally as backup
-          localStorage.setItem("portfolio-comments", JSON.stringify(existingComments));
-          
-          // Display updated comments
-          displayComments(existingComments);
-          
-          console.log('Comment saved to global database!');
-          showMessage('Comment shared globally! 🎉', 'success');
-        } else {
-          throw new Error('Failed to save to global database');
-        }
+        // Also save to sessionStorage for cross-tab sharing
+        sessionStorage.setItem("portfolio-comments", JSON.stringify(existingComments));
         
+        // Display updated comments
+        displayComments(existingComments);
+        
+        console.log('Comment saved successfully!');
+        
+        // Show success message
+        showMessage('Comment added successfully! 🎉', 'success');
       } catch (error) {
-        console.log('Error saving to global database:', error);
-        
-        // Fallback to localStorage only
-        try {
-          const existingComments = JSON.parse(localStorage.getItem("portfolio-comments") || '[]');
-          existingComments.push(commentData);
-          localStorage.setItem("portfolio-comments", JSON.stringify(existingComments));
-          displayComments(existingComments);
-          showMessage('Comment saved locally (global sync failed)', 'error');
-        } catch (localError) {
-          console.log('Error saving comment locally:', localError);
-          showMessage('Error saving comment. Please try again.', 'error');
-        }
+        console.log('Error saving comment:', error);
+        showMessage('Error saving comment. Please try again.', 'error');
       }
     }
     
@@ -1095,24 +1046,14 @@ displayComments(commentsData);
   
     // Load comments when page loads
     window.addEventListener("DOMContentLoaded", () => {
-loadGlobalComments();
-      
-      // Set up automatic refresh for real-time comments
-      setInterval(() => {
-        loadGlobalComments();
-      }, 30000); // Refresh every 30 seconds
+      loadComments();
     });
     
     // Listen for storage changes (comments from other tabs)
     window.addEventListener('storage', (e) => {
       if (e.key === 'portfolio-comments') {
-        loadGlobalComments();
+        loadComments();
       }
-    });
-    
-    // Also refresh when user focuses on the tab (in case they switched tabs)
-    window.addEventListener('focus', () => {
-      loadGlobalComments();
     });
   </script>
 
