@@ -4,8 +4,9 @@
 class WorkingSharedCommentSystem {
   constructor() {
     // Using JSONBin.io - a free JSON storage service that actually works
-    this.API_URL = 'https://api.jsonbin.io/v3/b/6889fab8ae596e708fbe2286';
+    this.BIN_ID = '6889fab8ae596e708fbe2286';
     this.API_KEY = '$2a$10$rrnjmqitdJT8yCg67rsCr.p7x.p.S620/Fmq7nVQthU0OvlUjafdu';
+    this.API_URL = `https://api.jsonbin.io/v3/b/${this.BIN_ID}`;
     
     // Fallback storage
     this.localStorageKey = 'portfolio-comments-backup';
