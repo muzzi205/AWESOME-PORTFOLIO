@@ -1,0 +1,307 @@
+<!-- 🌐 GLOBAL COMMENT SECTION TEMPLATE -->
+<!-- Copy this section into any HTML page to add global comments -->
+
+<!-- Add this to your <head> section if not already included -->
+<!--
+<script src="global_comment_system.js"></script>
+-->
+
+<!-- Comment Section HTML -->
+<section id="comments" style="padding: 4rem 2rem; text-align: center; background-color: #0f001a; color: white;">
+  <h2 style="font-size: 2.5rem; color: #f9004d; text-shadow: 0 0 15px #f9004d; margin-bottom: 2rem;">
+    💬 Global Comments
+  </h2>
+  
+  <div class="comment-container" style="
+    max-width: 700px;
+    margin: auto;
+    padding: 30px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 30px #00ffd544, 0 0 10px #f9004d33;
+    color: white;
+  ">
+    <p style="color: #aaa; font-size: 16px; margin-bottom: 20px;">
+      Comments are shared across the entire portfolio globally! 🌐
+    </p>
+    
+    <div class="head" style="margin: 10px 0; color: #aaa;">
+      <span id="comment-count">0</span> Comments
+    </div>
+
+    <div class="comments" style="margin-top: 20px; text-align: left; line-height: 21.7px;"></div>
+
+    <div class="commentbox" style="display: flex; gap: 10px; margin-top: 30px;">
+      <img class="selected-avatar-preview" src="./img1/user.png" alt="user" 
+           style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #f9004d;">
+      
+      <div class="contents" style="width: 100%;">
+        <h3 style="font-size: 17px; margin-bottom: 10px;">Choose Avatar:</h3>
+        
+        <div class="avatar-select" style="display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
+          <img src="ava1.png" class="avatar-option" data-avatar="ava1.png" 
+               style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;">
+          <img src="ava2.png" class="avatar-option" data-avatar="ava2.png" 
+               style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;">
+          <img src="ava3.png" class="avatar-option" data-avatar="ava3.png" 
+               style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;">
+          <img src="ava4.png" class="avatar-option" data-avatar="ava4.png" 
+               style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;">
+          <img src="ava5.png" class="avatar-option" data-avatar="ava5.png" 
+               style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;">
+          <img src="ava6.png" class="avatar-option" data-avatar="ava6.png" 
+               style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;">
+        </div>
+        
+        <input type="text" value="Anonymous" class="anonymous-input" 
+               style="width: 100%; margin-bottom: 10px; height: 40px; padding: 10px; border-radius: 10px; border: 1px solid #333; background: rgba(255,255,255,0.1); color: white;">
+        
+        <input type="text" placeholder="Enter your comment" class="usercomment" 
+               style="width: 100%; margin-bottom: 20px; height: 40px; padding: 10px; border-radius: 10px; border: 1px solid #333; background: rgba(255,255,255,0.1); color: white;">
+        
+        <button type="submit" disabled id="publish" style="
+          padding: 10px 30px;
+          border-radius: 40px;
+          border: 2px solid #f9004d;
+          background-color: #f9004d;
+          color: #1f242d;
+          font-weight: 600;
+          font-size: 16px;
+          box-shadow: 0 0 10px #f9004d;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        ">Publish</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- JavaScript for Comment Functionality -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  let selectedAvatar = "./img1/user.png";
+  let commentSystem;
+  
+  // Avatar selection logic
+  document.querySelectorAll(".avatar-option").forEach((img) => {
+    img.addEventListener("click", () => {
+      selectedAvatar = img.dataset.avatar;
+      document.querySelector(".selected-avatar-preview").src = selectedAvatar;
+
+      // Highlight selected avatar
+      document.querySelectorAll(".avatar-option").forEach(i => i.style.border = "none");
+      img.style.border = "2px solid #00ffae";
+    });
+  });
+
+  const anonymousInput = document.querySelector(".anonymous-input");
+  const userComment = document.querySelector(".usercomment");
+  const publishBtn = document.querySelector("#publish");
+  const comments = document.querySelector(".comments");
+
+  userComment.addEventListener("input", (e) => {
+    publishBtn.disabled = e.currentTarget.value === "";
+  });
+
+  // Initialize comment system
+  async function initializeComments() {
+    try {
+      // Use existing global instance or create new one
+      commentSystem = window.portfolioComments;
+      if (!commentSystem) {
+        commentSystem = new UniversalGlobalComments();
+        await commentSystem.init();
+      }
+      await loadComments();
+      console.log('🌐 Global comments ready on this page!');
+    } catch (error) {
+      console.error('Failed to initialize comment system:', error);
+      loadLocalComments();
+    }
+  }
+
+  async function loadComments() {
+    try {
+      if (commentSystem) {
+        const globalComments = await commentSystem.loadComments();
+        displayComments(globalComments);
+      } else {
+        loadLocalComments();
+      }
+    } catch (error) {
+      console.log('Error loading global comments:', error);
+      loadLocalComments();
+    }
+  }
+  
+  function loadLocalComments() {
+    try {
+      const savedComments = localStorage.getItem("universal-portfolio-comments");
+      const commentsData = savedComments ? JSON.parse(savedComments) : [];
+      displayComments(commentsData);
+    } catch (error) {
+      console.log('Error loading local comments:', error);
+      displayComments([]);
+    }
+  }
+  
+  function displayComments(commentsData) {
+    comments.innerHTML = '';
+    const sortedComments = commentsData.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    
+    sortedComments.forEach(comment => {
+      const publishedComment = `
+        <div class="parent" style="display: flex; gap: 10px; margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.02); border-radius: 10px; border-left: 3px solid #00ffae;">
+          <img src="${comment.avatar || './img1/user.png'}" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid #f9004d;">
+          <div style="flex: 1;">
+            <h1 style="font-size: 16px; color: #00ffae; margin-bottom: 5px;">${comment.name || comment.author || 'Anonymous'}</h1>
+            <p style="font-size: 14px; color: #fff; margin-bottom: 8px; line-height: 1.4;">${comment.message || comment.text}</p>
+            <span style="font-size: 11px; color: #aaa;">${comment.date}</span>
+            ${comment.isGlobal ? '<span style="font-size: 10px; color: #00ffae; margin-left: 10px;">🌐 Global</span>' : ''}
+          </div>
+        </div>
+      `;
+      comments.innerHTML += publishedComment;
+    });
+    
+    document.getElementById("comment-count").textContent = commentsData.length;
+  }
+  
+  async function saveComment(commentData) {
+    try {
+      if (commentSystem) {
+        const result = await commentSystem.saveComment({
+          author: commentData.name,
+          text: commentData.message,
+          avatar: commentData.avatar
+        });
+        
+        if (result.success) {
+          showMessage('🎉 Comment posted globally!', 'success');
+        } else {
+          showMessage(result.message, 'warning');
+        }
+        await loadComments();
+      } else {
+        // Fallback to local storage
+        const existingComments = JSON.parse(localStorage.getItem("universal-portfolio-comments") || '[]');
+        existingComments.push(commentData);
+        localStorage.setItem("universal-portfolio-comments", JSON.stringify(existingComments));
+        displayComments(existingComments);
+        showMessage('Comment saved locally.', 'warning');
+      }
+    } catch (error) {
+      console.log('Error saving comment:', error);
+      showMessage('Comment saved locally.', 'warning');
+    }
+  }
+  
+  function showMessage(text, type) {
+    const message = document.createElement('div');
+    message.style.cssText = `
+      position: fixed;
+      top: 100px;
+      right: 20px;
+      padding: 15px 25px;
+      border-radius: 10px;
+      color: white;
+      font-weight: bold;
+      z-index: 10000;
+      animation: slideIn 0.3s ease;
+      ${type === 'success' ? 'background: linear-gradient(45deg, #00ffae, #00d4aa);' : 
+        type === 'warning' ? 'background: linear-gradient(45deg, #ff9800, #f57c00);' :
+        'background: linear-gradient(45deg, #f9004d, #d4002a);'}
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    `;
+    message.textContent = text;
+    document.body.appendChild(message);
+    
+    setTimeout(() => {
+      message.style.animation = 'slideOut 0.3s ease';
+      setTimeout(() => message.remove(), 300);
+    }, 3000);
+  }
+
+  async function addComment() {
+    const name = anonymousInput.value.trim() || "Anonymous";
+    const message = userComment.value.trim();
+    
+    if (!message) {
+      showMessage('Please enter a comment!', 'error');
+      return;
+    }
+    
+    const commentData = {
+      name: name,
+      message: message,
+      date: new Date().toLocaleString(),
+      avatar: selectedAvatar,
+      timestamp: Date.now(),
+      id: Date.now() + Math.random()
+    };
+    
+    // Save comment
+    await saveComment(commentData);
+    
+    // Clear form
+    userComment.value = "";
+    anonymousInput.value = "Anonymous";
+    publishBtn.disabled = true;
+  }
+
+  publishBtn.addEventListener("click", addComment);
+  
+  // Allow Enter key to submit
+  userComment.addEventListener("keypress", async (e) => {
+    if (e.key === 'Enter' && !publishBtn.disabled) {
+      await addComment();
+    }
+  });
+
+  // Initialize when ready
+  initializeComments();
+  
+  // Auto-refresh comments every 30 seconds
+  setInterval(async () => {
+    if (commentSystem && navigator.onLine) {
+      try {
+        await loadComments();
+      } catch (error) {
+        console.log('Auto-refresh failed:', error);
+      }
+    }
+  }, 30000);
+});
+
+// Add animation styles
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  @keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+  }
+  
+  .avatar-option:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 10px #00ffae;
+  }
+  
+  #publish:not(:disabled):hover {
+    background: transparent;
+    color: #f9004d;
+    box-shadow: none;
+  }
+  
+  #publish:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+document.head.appendChild(style);
+</script>

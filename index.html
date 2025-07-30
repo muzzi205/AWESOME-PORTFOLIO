@@ -867,8 +867,8 @@ footer a:hover {
     </div>
   </footer>
   
-  <!-- Load new working global comment system -->
-  <script src="new_global_comments.js"></script>
+  <!-- Load Universal Global Comment System -->
+  <script src="global_comment_system.js"></script>
   
   <script>
     let selectedAvatar = "./img1/user.png";
@@ -895,13 +895,17 @@ footer a:hover {
       publishBtn.disabled = e.currentTarget.value === "";
     });
 
-    // Initialize new global comment system
+    // Initialize Universal Global Comment System
     async function initializeComments() {
       try {
-        commentSystem = new NewGlobalCommentSystem();
-        await commentSystem.init();
+        // Use the global instance created by the system
+        commentSystem = window.portfolioComments;
+        if (!commentSystem) {
+          commentSystem = new UniversalGlobalComments();
+          await commentSystem.init();
+        }
         await loadComments();
-        console.log('🌐 New global comment system ready!');
+        console.log('🌐 Universal Global Comment System ready!');
         showMessage('🌐 Global comment system is now active!', 'success');
       } catch (error) {
         console.error('Failed to initialize comment system:', error);
