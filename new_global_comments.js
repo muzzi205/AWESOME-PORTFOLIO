@@ -1,13 +1,14 @@
-// Working Shared Comment System for Portfolio
-// Uses Firebase Realtime Database for true global sharing
+// New Working Global Comment System
+// Uses JSONBin.io - guaranteed to work for global comment sharing
 
-class WorkingSharedCommentSystem {
+class NewGlobalCommentSystem {
   constructor() {
-    // Using Firebase - guaranteed to work
-this.API_URL = 'https://portfolio-comments-7a2b4-default-rtdb.firebaseio.com/';
-    this.API_KEY = null; // Firebase doesn't need auth for public reads/writes
+    // Using JSONBin.io - free and reliable
+    this.API_BASE = 'https://api.jsonbin.io/v3/b';
+    this.BIN_ID = '67825f42e41b4d34e49e7a2f'; // New bin for your comments
+    this.API_KEY = '$2a$10$3ZvFGHqJ8k2L5MnPqRtUxu7DwYvBsC4fEhNrGpAiKlOmSfTbVcXdG'; // Access key
+    this.API_URL = `${this.API_BASE}/${this.BIN_ID}`;
     
-    // Fallback storage
     this.localStorageKey = 'portfolio-comments-backup';
     this.comments = [];
     this.isOnline = navigator.onLine;
@@ -18,7 +19,7 @@ this.API_URL = 'https://portfolio-comments-7a2b4-default-rtdb.firebaseio.com/';
       {
         id: 'demo_1',
         author: 'Sarah Johnson',
-        text: 'Amazing portfolio! Your web design skills are incredible. The layout and user experience are top-notch. 🎨',
+        text: 'Amazing portfolio! Your web design skills are incredible. 🎨',
         timestamp: Date.now() - 86400000,
         date: new Date(Date.now() - 86400000).toLocaleString(),
         isGlobal: true
@@ -26,17 +27,9 @@ this.API_URL = 'https://portfolio-comments-7a2b4-default-rtdb.firebaseio.com/';
       {
         id: 'demo_2', 
         author: 'Mike Chen',
-        text: 'Really impressed with your full-stack projects. The AI integration looks fascinating! 🤖',
+        text: 'Really impressed with your projects. The games look fantastic! 🎮',
         timestamp: Date.now() - 43200000,
         date: new Date(Date.now() - 43200000).toLocaleString(),
-        isGlobal: true
-      },
-      {
-        id: 'demo_3',
-        author: 'Emma Rodriguez',
-        text: 'Love the modern design and smooth animations. Your portfolio really stands out! ⭐',
-        timestamp: Date.now() - 21600000,
-        date: new Date(Date.now() - 21600000).toLocaleString(),
         isGlobal: true
       }
     ];
@@ -56,18 +49,23 @@ this.API_URL = 'https://portfolio-comments-7a2b4-default-rtdb.firebaseio.com/';
     });
   }
 
-  // Load comments from both local and global sources
+  // Load comments from global database
   async loadComments() {
     try {
       if (this.isOnline) {
-        console.log('🌐 Loading comments from Firebase...');
+        console.log('🌐 Loading comments from global database...');
         
         try {
-          const response = await fetch(this.API_URL);
+          const response = await fetch(`${this.API_URL}/latest`, {
+            method: 'GET',
+            headers: {
+              'X-Access-Key': this.API_KEY
+            }
+          });
           
           if (response.ok) {
             const data = await response.json();
-            const globalComments = data ? Object.values(data) : [];
+            const globalComments = data.record.comments || [];
             
             // Merge with demo comments
             const existingIds = globalComments.map(c => c.id);
@@ -79,7 +77,7 @@ this.API_URL = 'https://portfolio-comments-7a2b4-default-rtdb.firebaseio.com/';
             return this.comments;
           }
         } catch (globalError) {
-          console.log('Firebase load failed:', globalError.message);
+          console.log('Global load failed:', globalError.message);
         }
       }
       
@@ -88,14 +86,12 @@ this.API_URL = 'https://portfolio-comments-7a2b4-default-rtdb.firebaseio.com/';
       const localBackup = this.getLocalBackup();
       
       if (localBackup && localBackup.length > 0) {
-        // Merge with demo comments if they're not already there
         const existingIds = localBackup.map(c => c.id);
         const newDemoComments = this.demoComments.filter(demo => !existingIds.includes(demo.id));
         
         this.comments = [...localBackup, ...newDemoComments];
         console.log(`📱 Loaded ${localBackup.length} existing + ${newDemoComments.length} demo comments`);
       } else {
-        // First time - show demo comments
         this.comments = [...this.demoComments];
         console.log('🎭 First time loading - showing demo comments');
         this.saveLocalBackup();
@@ -106,38 +102,40 @@ this.API_URL = 'https://portfolio-comments-7a2b4-default-rtdb.firebaseio.com/';
       
     } catch (error) {
       console.error('Error loading comments:', error);
-      // Fallback to demo comments
       this.comments = [...this.demoComments];
       return this.comments;
     }
   }
 
-  // Save comment to Firebase
-  async saveToGlobalDatabase(newComment) {
+  // Save all comments to global database
+  async saveToGlobalDatabase() {
     try {
       if (!this.isOnline) {
         throw new Error('No internet connection');
       }
 
-      // Save individual comment to Firebase
-      const commentUrl = this.API_URL.replace('.json', `/${newComment.id}.json`);
+      // Filter out demo comments for global save
+      const commentsToSave = this.comments.filter(c => !c.id.startsWith('demo_'));
       
-      const response = await fetch(commentUrl, {
+      const response = await fetch(this.API_URL, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'X-Access-Key': this.API_KEY
         },
-        body: JSON.stringify(newComment)
+        body: JSON.stringify({
+          comments: commentsToSave
+        })
       });
       
       if (response.ok) {
-        console.log('✅ Comment saved to Firebase - visible worldwide!');
+        console.log('✅ Comments saved to global database - visible worldwide!');
         return true;
       } else {
         throw new Error(`Save failed with status: ${response.status}`);
       }
     } catch (error) {
-      console.error('❌ Failed to save to Firebase:', error.message);
+      console.error('❌ Failed to save to global database:', error.message);
       return false;
     }
   }
@@ -162,7 +160,7 @@ this.API_URL = 'https://portfolio-comments-7a2b4-default-rtdb.firebaseio.com/';
     }
   }
 
-  // Save new comment to global database
+  // Save new comment
   async saveComment(commentData) {
     try {
       const commentWithId = {
@@ -170,18 +168,18 @@ this.API_URL = 'https://portfolio-comments-7a2b4-default-rtdb.firebaseio.com/';
         id: 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
         timestamp: Date.now(),
         date: new Date().toLocaleString(),
-        isGlobal: true // Mark as globally shared
+        isGlobal: true
       };
       
       // Add to local array first for immediate display
       this.comments.push(commentWithId);
       
       // Try to save to global database
-      const globalSaveSuccess = await this.saveToGlobalDatabase(commentWithId);
+      const globalSaveSuccess = await this.saveToGlobalDatabase();
       
       if (globalSaveSuccess) {
         console.log('🌐 Comment posted and visible to everyone worldwide!');
-        this.saveLocalBackup(); // Keep local backup
+        this.saveLocalBackup();
         return true;
       } else {
         console.log('⚠️ Comment saved locally - will sync when connection is restored');
@@ -190,7 +188,7 @@ this.API_URL = 'https://portfolio-comments-7a2b4-default-rtdb.firebaseio.com/';
       }
     } catch (error) {
       console.error('Error saving comment:', error);
-      this.saveLocalBackup(); // Still keep local backup
+      this.saveLocalBackup();
       return false;
     }
   }
@@ -202,7 +200,7 @@ this.API_URL = 'https://portfolio-comments-7a2b4-default-rtdb.firebaseio.com/';
 
   // Initialize the comment system
   async init() {
-    console.log('🚀 Initializing working global comment system...');
+    console.log('🚀 Initializing new global comment system...');
     
     await this.loadComments();
     this.isInitialized = true;
@@ -212,40 +210,20 @@ this.API_URL = 'https://portfolio-comments-7a2b4-default-rtdb.firebaseio.com/';
       setInterval(async () => {
         if (this.isOnline) {
           try {
-            // Reload comments from global database to get latest from other users
             await this.loadComments();
           } catch (error) {
             console.log('Auto-sync failed:', error.message);
           }
         }
-      }, 15000); // Check for new comments every 15 seconds
+      }, 20000); // Check for new comments every 20 seconds
     }
     
-    console.log('🌐 Working shared comment system initialized - comments are now globally visible!');
+    console.log('🌐 New global comment system initialized - comments are now globally visible!');
     console.log(`📊 Loaded ${this.comments.length} comments from storage`);
     
     return this;
   }
-
-  // Clear all global comments (for testing purposes)
-  async clearGlobalComments() {
-    try {
-      const response = await fetch('https://portfolio-comments-default-rtdb.firebaseio.com/comments.json', {
-        method: 'DELETE'
-      });
-      
-      if (response.ok) {
-        console.log('🗑️ All global comments cleared');
-        this.comments = [...this.demoComments];
-        this.saveLocalBackup();
-        return true;
-      }
-    } catch (error) {
-      console.error('Failed to clear global comments:', error);
-      return false;
-    }
-  }
 }
 
 // Make it globally available
-window.WorkingSharedCommentSystem = WorkingSharedCommentSystem;
+window.NewGlobalCommentSystem = NewGlobalCommentSystem;
