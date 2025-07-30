@@ -4,7 +4,7 @@
 class WorkingSharedCommentSystem {
   constructor() {
     // Using JSONBin.io - a free JSON storage service that actually works
-    this.API_URL = 'https://api.jsonbin.io/v3/b/6889f346f7e7a370d1f051ce';
+    this.API_URL = 'https://api.jsonbin.io/v3/b/6889fab8ae596e708fbe2286';
     this.API_KEY = '$2a$10$rrnjmqitdJT8yCg67rsCr.p7x.p.S620/Fmq7nVQthU0OvlUjafdu';
     
     // Fallback storage
