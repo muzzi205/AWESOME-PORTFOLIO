@@ -91,20 +91,29 @@ class SharedCommentSystem {
     }
   }
 
-  // Save comments to global JSONBin database
-  async saveToGlobalDatabase(comments) {
+  // Save all comments to JSONBin
+  async saveToGlobalDatabase(newComment) {
     try {
+      if (!this.isOnline) {
+        throw new Error('No internet connection');
+      }
+
+      // Get current comments and filter out demo comments for global save
+      const updatedComments = this.comments.filter(c => !c.id.startsWith('demo_'));
+      
       const response = await fetch(this.API_URL, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'X-Master-Key': this.API_KEY
+          'X-Access-Key': this.API_KEY
         },
-        body: JSON.stringify(comments)
+        body: JSON.stringify({
+          comments: updatedComments
+        })
       });
       
       if (response.ok) {
-        console.log('✅ Comments saved to global database - visible worldwide!');
+        console.log('✅ Comment saved to global database - visible worldwide!');
         return true;
       } else {
         throw new Error(`Save failed with status: ${response.status}`);
@@ -139,23 +148,25 @@ class SharedCommentSystem {
   // Save new comment to global database (JSONBin)
   async saveComment(commentData) {
     try {
+      if (!this.isOnline) {
+        throw new Error('No internet connection');
+      }
+
       const commentWithId = {
         ...commentData,
         id: 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
         timestamp: Date.now(),
         date: new Date().toLocaleString(),
-        isGlobal: true // Mark as globally shared
+        isGlobal: true
       };
-      
-      // Add to local array first
+
       this.comments.push(commentWithId);
-      
-      // Try to save to global database
-      const globalSaveSuccess = await this.saveToGlobalDatabase(this.comments);
-      
+
+      const globalSaveSuccess = await this.saveToGlobalDatabase(commentWithId);
+
       if (globalSaveSuccess) {
         console.log('🌐 Comment posted and visible to everyone worldwide!');
-        this.saveLocalBackup(); // Keep local backup
+        this.saveLocalBackup();
         return true;
       } else {
         console.log('⚠️ Comment saved locally - will sync when connection is restored');
@@ -164,7 +175,7 @@ class SharedCommentSystem {
       }
     } catch (error) {
       console.error('Error saving comment:', error);
-      this.saveLocalBackup(); // Still keep local backup
+      this.saveLocalBackup();
       return false;
     }
   }

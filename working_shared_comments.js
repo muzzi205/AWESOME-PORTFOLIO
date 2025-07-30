@@ -3,8 +3,9 @@
 
 class WorkingSharedCommentSystem {
   constructor() {
-    // Firebase Realtime Database configuration (free tier)
-    this.FIREBASE_URL = 'https://portfolio-comments-default-rtdb.firebaseio.com/comments.json';
+    // Using JSONBin.io - a free JSON storage service that actually works
+    this.API_URL = 'https://api.jsonbin.io/v3/b/67507a42acd3cb34a8b2c8f1';
+    this.API_KEY = '$2a$10$k1XQ8l2z9YoP5.I7FdBLxeLmV4Qv6ZR3pT8Nd0MCFGjU4HqWKoE9.';
     
     // Fallback storage
     this.localStorageKey = 'portfolio-comments-backup';
@@ -61,24 +62,27 @@ class WorkingSharedCommentSystem {
       if (this.isOnline) {
         console.log('🌐 Loading comments from global database...');
         
-        // Try to load from global database
+        // Try to load from JSONBin
         try {
-          const response = await fetch(this.FIREBASE_URL);
-          if (response.ok) {
-            const globalData = await response.json();
-            if (globalData) {
-              // Convert Firebase object to array
-              const globalComments = Object.values(globalData);
-              
-              // Merge with demo comments if they're not already there
-              const existingIds = globalComments.map(c => c.id);
-              const newDemoComments = this.demoComments.filter(demo => !existingIds.includes(demo.id));
-              
-              this.comments = [...globalComments, ...newDemoComments];
-              this.saveLocalBackup();
-              console.log(`🌐 Loaded ${globalComments.length} global + ${newDemoComments.length} demo comments`);
-              return this.comments;
+          const response = await fetch(`${this.API_URL}/latest`, {
+            method: 'GET',
+            headers: {
+              'X-Access-Key': this.API_KEY
             }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            const globalComments = data.record.comments || [];
+            
+            // Merge with demo comments if they're not already there
+            const existingIds = globalComments.map(c => c.id);
+            const newDemoComments = this.demoComments.filter(demo => !existingIds.includes(demo.id));
+            
+            this.comments = [...globalComments, ...newDemoComments];
+            this.saveLocalBackup();
+            console.log(`🌐 Loaded ${globalComments.length} global + ${newDemoComments.length} demo comments`);
+            return this.comments;
           }
         } catch (globalError) {
           console.log('Global load failed, using local backup:', globalError.message);
@@ -114,23 +118,25 @@ class WorkingSharedCommentSystem {
     }
   }
 
-  // Save comments to Firebase Realtime Database
-  async saveToGlobalDatabase(comment) {
+  // Save all comments to JSONBin
+  async saveToGlobalDatabase(newComment) {
     try {
       if (!this.isOnline) {
         throw new Error('No internet connection');
       }
 
-      // Create a unique Firebase key for this comment
-      const firebaseKey = `comment_${comment.id}`;
-      const commentUrl = `https://portfolio-comments-default-rtdb.firebaseio.com/comments/${firebaseKey}.json`;
+      // Get current comments and add the new one
+      const updatedComments = this.comments.filter(c => !c.id.startsWith('demo_')); // Remove demo comments from global save
       
-      const response = await fetch(commentUrl, {
+      const response = await fetch(this.API_URL, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'X-Access-Key': this.API_KEY
         },
-        body: JSON.stringify(comment)
+        body: JSON.stringify({
+          comments: updatedComments
+        })
       });
       
       if (response.ok) {
